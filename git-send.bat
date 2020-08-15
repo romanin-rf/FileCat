@@ -6,6 +6,7 @@ echo -----------
 pause
 echo -----------
 git add .
+echo Done!!!
 echo -----------
 pause
 echo -----------
