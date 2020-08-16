@@ -16,6 +16,7 @@ root.title("{0}".format(language_data["name_window"])) # Имя окна
 
 # Создание объектов
 language_change_B = Button(root, text = "{0}".format(language_data['name_lang']))
+version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
 
 # Логика
 def language_change_click(event):
@@ -51,7 +52,7 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 language_change_B.bind('<Button-1>', language_change_click)
 
 # Выгрузка объектов на экран
-language_change_B.pack()
 language_change_B.place(x = 5, y = 5)
+version_text_var.place(x = 5, y = 580)
 
 root.mainloop()
