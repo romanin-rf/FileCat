@@ -1,5 +1,7 @@
-import os, json, time, tkinter
+import os, json, time, tkinter, math
 from tkinter import *
+import tkinter.ttk as ttk
+import RomaninDeveloperLibs
 
 # Выгрузка config.json
 with open('config.json') as cnfFILE:
@@ -17,6 +19,13 @@ root.title("{0}".format(language_data["name_window"])) # Имя окна
 # Создание объектов
 language_change_B = Button(root, text = "{0}".format(language_data['name_lang']))
 version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
+'''bit_progressbar = ttk.Progressbar(root, length = 150)
+text_output_bit_progressbar = Label(root)
+with open('user_data.json') as UserDataFile:
+	UserDataTest = json.load(UserDataFile)
+value_bit_progressbar = RomaninDeveloperLibs.calculate_whole_percentage(UserDataTest["vaule"], UserDataTest["vaule-max"])
+bit_progressbar['value'] = value_bit_progressbar
+text_output_bit_progressbar['text'] = "({0}%) {1}/{}".format(value_bit_progressbar, UserDataTest["vaule"], UserDataTest["vaule-max"])'''
 
 # Логика
 def language_change_click(event):
@@ -27,9 +36,11 @@ def language_change_click(event):
 		if config_data["language"] == list_languages[id_lang_list]:
 			break
 		id_lang_list += 1
+
 	id_lang_list += 1
 	if id_lang_list == len(list_languages):
 		id_lang_list = 0
+
 	loading_text_language(event, id_lang_list, list_languages, config_data)
 
 def loading_text_language(event, id_lang, list_langs, config_data):
@@ -54,5 +65,7 @@ language_change_B.bind('<Button-1>', language_change_click)
 # Выгрузка объектов на экран
 language_change_B.place(x = 5, y = 5)
 version_text_var.place(x = 5, y = 580)
+'''bit_progressbar.place(x = 5, y = 40)
+text_output_bit_progressbar.pack()'''
 
 root.mainloop()
