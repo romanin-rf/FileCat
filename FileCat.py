@@ -1,7 +1,17 @@
 import os, json, time, tkinter, math
 from tkinter import *
 import tkinter.ttk as ttk
-import RomaninDeveloperLibs
+
+def calculate_whole_percentage(max_var, var, percent):
+	import math
+	one_percentage = max_var/percent
+	not_whole_output = var/one_percentage
+	whole_output = math.ceil(not_whole_output)
+	if whole_output >= percent:
+		output = percent
+	else:
+		output = whole_output
+	return output
 
 # Выгрузка config.json
 with open('config.json') as cnfFILE:
@@ -21,6 +31,7 @@ language_change_B = Button(root, text = "{0}".format(language_data['name_lang'])
 version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
 bit_progressbar = ttk.Progressbar(root, length = 570)
 bit_progressbar_value_text = Label(root, text = "{0}: *\* (* %)".format(language_data["text_window"]["text_progress"]))
+text_warning = Label(root, text = "{0}".format(language_data["text_window"]["text_warning"]))
 
 # Логика
 def language_change_click(event):
@@ -62,5 +73,6 @@ language_change_B.place(x = 5, y = 5)
 version_text_var.place(x = 5, y = 580)
 bit_progressbar.place(x = 100, y = 5)
 bit_progressbar_value_text.place(x = 100, y = 30)
+text_warning.place(x = 250, y = 200)
 
 root.mainloop()
