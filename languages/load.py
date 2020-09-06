@@ -4,7 +4,8 @@ data = 	{
 			"name_lang": 	"Русский", 
 			"name_window": 	"Файловый Кот", 
 			"text_window": 	{
-								"text_version": "Версия"
+								"text_version": "Версия",
+								"text_progress": "Прогресс"
 							}
 		}
 
