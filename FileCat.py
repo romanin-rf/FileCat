@@ -3,7 +3,6 @@ from tkinter import *
 import tkinter.ttk as ttk
 
 def calculate_whole_percentage(max_var, var, percent):
-	import math
 	one_percentage = max_var/percent
 	not_whole_output = var/one_percentage
 	whole_output = math.ceil(not_whole_output)
