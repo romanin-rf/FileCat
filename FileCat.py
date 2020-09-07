@@ -31,7 +31,6 @@ version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_wind
 bit_progressbar = ttk.Progressbar(root, length = 570)
 bit_progressbar_value_text = Label(root, text = "{0}: *\\* (* %)".format(language_data["text_window"]["text_progress"]))
 
-
 # Логика
 def language_change_click(event):
 	list_languages = os.listdir(path = "{0}\\languages".format((os.getcwd())))
@@ -41,10 +40,19 @@ def language_change_click(event):
 		if config_data["language"] == list_languages[id_lang_list]:
 			break
 		id_lang_list += 1
-
+	
 	id_lang_list += 1
 	if id_lang_list == len(list_languages):
 		id_lang_list = 0
+	name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(os.getcwd(), list_languages[id_lang_list]))
+	while type_file_lang != ".json":
+		name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(os.getcwd(), list_languages[id_lang_list]))
+		if type_file_lang == ".json":
+			break
+		else:
+			if id_lang_list == len(list_languages):
+				id_lang_list = 0
+		id_lang_list += 1
 
 	loading_text_language(event, id_lang_list, list_languages, config_data)
 
