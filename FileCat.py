@@ -29,7 +29,7 @@ root.title("{0}".format(language_data["name_window"])) # Имя окна
 language_change_B = Button(root, text = "{0}".format(language_data['name_lang']))
 version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
 bit_progressbar = ttk.Progressbar(root, length = 570)
-bit_progressbar_value_text = Label(root, text = "{0}: *\* (* %)".format(language_data["text_window"]["text_progress"]))
+bit_progressbar_value_text = Label(root, text = "{0}: *\\* (* %)".format(language_data["text_window"]["text_progress"]))
 text_warning = Label(root, text = "{0}".format(language_data["text_window"]["text_warning"]))
 
 # Логика

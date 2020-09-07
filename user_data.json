@@ -1,1 +1,10 @@
-{"vaule-max": 500, "vaule": 268}
+{
+	"save": {
+				"start-vaule": 250,
+				"you-user": 0,
+				"multiplier-start-vaule": 1,
+				"multiplier-money": 1
+			},
+	"speed-rise-multiplier-start-vaule": 0.5,
+	"speed-rise-multiplier-money": 0.1
+}
