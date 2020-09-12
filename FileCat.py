@@ -12,7 +12,7 @@ def calculate_whole_percentage(max_var, var, percent):
 		output = whole_output
 	return output
 
-logging_file = "{0}\\log\\{1}".format(os.getcwd(), 'FileCat{0}.log'.format(time.strftime("(%d-%m-%Y)", time.localtime())))
+logging_file = "{0}\\log\\{1}".format(os.getcwd(), '{0}.log'.format(time.strftime("%d-%m-%Y#%H-%M", time.localtime())))
 
 logging.basicConfig(
 	level = logging.DEBUG, 
