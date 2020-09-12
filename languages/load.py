@@ -5,7 +5,8 @@ data = 	{
 			"name_window": 	"Файловый Кот", 
 			"text_window": 	{
 								"text_version": "Версия",
-								"text_progress": "Прогресс"
+								"text_progress": "Прогресс",
+								"text_money": "Монет"
 							}
 		}
 

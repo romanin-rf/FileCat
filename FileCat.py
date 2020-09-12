@@ -15,6 +15,8 @@ def calculate_whole_percentage(max_var, var, percent):
 # Выгрузка config.json
 with open('config.json') as cnfFILE:
 	config_data = json.load(cnfFILE)
+with open('user_data.json') as user_data_file:
+	usr_data = json.load(user_data_file)
 
 # Выгрузка языка
 with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
@@ -30,6 +32,7 @@ language_change_B = Button(root, text = "{0}".format(language_data['name_lang'])
 version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
 bit_progressbar = ttk.Progressbar(root, length = 570)
 bit_progressbar_value_text = Label(root, text = "{0}: *\\* (* %)".format(language_data["text_window"]["text_progress"]))
+money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 
 # Логика
 def language_change_click(event):
@@ -80,5 +83,6 @@ language_change_B.place(x = 5, y = 5)
 version_text_var.place(x = 5, y = 580)
 bit_progressbar.place(x = 100, y = 5)
 bit_progressbar_value_text.place(x = 100, y = 30)
+money_vaule_text.place(x = 100, y = 50)
 
 root.mainloop()
