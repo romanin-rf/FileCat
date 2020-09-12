@@ -27,7 +27,7 @@ try:
 	logging.debug("FileCat загрузил библеотеки")
 except:
 	logging.warning("FileCat неудалось загрузить библеотеки")
-	exit()
+	root.quit()
 
 try:
 	with open('user_data.json') as user_data_file:
@@ -35,7 +35,7 @@ try:
 	logging.debug("FileCat загрузил пользовательские сохранения")
 except:
 	logging.warning("FileCat неудалось загрузить пользовательские сохранения")
-	exit()
+	root.quit()
 
 try:
 	with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
@@ -43,6 +43,7 @@ try:
 	logging.debug("FileCat загрузил языковой словарь")
 except:
 	logging.warning("FileCat неудалось загрузить языковой словарь")
+	root.quit()
 
 root = Tk() # Создание окна
 root.geometry('700x600') # Размер окна
