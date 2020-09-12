@@ -21,12 +21,13 @@ logging.basicConfig(
 	filemode = 'w'
 )
 logging.info("---- Стадия загрузки --------------------------------------")
+logging.debug("")
 try:
 	with open('config.json') as cnfFILE:
 		config_data = json.load(cnfFILE)
-	logging.debug("FileCat загрузил библеотеки")
+	logging.debug("FileCat загрузил файлы конфигурации")
 except:
-	logging.warning("FileCat неудалось загрузить библеотеки")
+	logging.warning("FileCat неудалось загрузить файлы конфигурации")
 	root.quit()
 
 try:
