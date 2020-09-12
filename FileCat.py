@@ -106,7 +106,7 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 	with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
 		language_data = json.load(LANGFILE)
 
-	logging.info("FileCat сменил язык")
+	logging.debug("FileCat сменил язык")
 
 	root.quit()
 logging.debug("FileCat загрузил функцию 'loading_text_language'")
