@@ -1,6 +1,7 @@
-import os, json, time, tkinter, math, logging
+import os, json, time, tkinter, math, logging, tkinter.ttk as ttk
 from tkinter import *
-import tkinter.ttk as ttk
+from PIL import *
+from PIL import Image, ImageTk
 
 def calculate_whole_percentage(max_var, var, percent):
 	one_percentage = max_var / percent
@@ -21,7 +22,7 @@ logging.basicConfig(
 	filemode = 'w'
 )
 logging.info("---- Стадия загрузки --------------------------------------")
-logging.debug("")
+logging.debug("FileCat загрузил библеотеки")
 try:
 	with open('config.json') as cnfFILE:
 		config_data = json.load(cnfFILE)
@@ -68,6 +69,8 @@ logging.debug("FileCat загрузил элемент окна под назв�
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 logging.debug("FileCat загрузил элемент окна под названием 'money_vaule_text'")
 
+logging.debug("FileCat загрузил элемент окна под названием 'money_img'")
+
 # Логика
 def language_change_click(event):
 	list_languages = os.listdir(path = "{0}\\languages".format((os.getcwd())))
@@ -104,9 +107,6 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 
 	with open('config.json') as cnfFILE:
 		config_data = json.load(cnfFILE)
-
-	with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
-		language_data = json.load(LANGFILE)
 
 	logging.debug("FileCat сменил язык")
 
