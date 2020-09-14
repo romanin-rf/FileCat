@@ -1,7 +1,5 @@
 import os, json, time, tkinter, math, logging, tkinter.ttk as ttk
 from tkinter import *
-from PIL import *
-from PIL import Image, ImageTk
 
 def calculate_whole_percentage(max_var, var, percent):
 	one_percentage = max_var / percent
