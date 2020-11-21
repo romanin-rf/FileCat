@@ -79,4 +79,5 @@ version_text_var.place(x = 5, y = 580)
 bit_progressbar.place(x = 100, y = 5)
 bit_progressbar_value_text.place(x = 100, y = 30)
 money_vaule_text.place(x = 100, y = 50)
+
 root.mainloop()
