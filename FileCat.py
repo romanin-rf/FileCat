@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import math
@@ -26,31 +27,37 @@ with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as
 	language_data = json.load(LANGFILE)
 
 root = Tk() # Создание окна
-root.geometry('700x600') # Размер окна
+root.geometry('{0}x{1}'.format(config_data["window"][0], config_data["window"][1])) # Размер окна
 root.resizable(width = False, height = False) # Блокировка размера окна, чтобы его нельзя было изменить
 root.title("{0}".format(language_data["name_window"])) # Имя окна
 
 # Обрабочик
-def handler_progress(userdata):
-	if userdata["save"]["start-value"] <= userdata["save"]["you-user"]:
-		userdata["save"]["multiplier-start-value"] += userdata["setting"]["speed-rise-multiplier-start-value"]
-		userdata["save"]["money"] += userdata["setting"]["start-money-for-lvl"]
-	max_start_value = userdata["save"]["start-value"] * userdata["save"]["multiplier-start-value"]
-	progress_percentage = calculate_whole_percentage(max_var = max_start_value, var = userdata["save"]["you-user"], percent = 100)
+def handler_progress():
+	global usr_data
+	if usr_data["save"]["start-value"] <= usr_data["save"]["you-user"]:
+		usr_data["save"]["multiplier-start-value"] += usr_data["setting"]["speed-rise-multiplier-start-value"]
+		usr_data["save"]["money"] += (usr_data["setting"]["start-money-for-lvl"] * usr_data["save"]["multiplier-money"])
+		usr_data["save"]["multiplier-money"] += usr_data["setting"]["speed-rise-multiplier-money"]
+	max_start_value = usr_data["save"]["start-value"] * usr_data["save"]["multiplier-start-value"]
+	progress_percentage = calculate_whole_percentage(max_var = max_start_value, var = usr_data["save"]["you-user"], percent = 100)
 	with open('user_data.json', "w") as user_data_file:
-		json.dump(userdata, user_data_file)
-	return max_start_value, userdata["save"]["you-user"], progress_percentage
+		json.dump(usr_data, user_data_file)
+	return max_start_value, usr_data["save"]["you-user"], progress_percentage
 
-max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress(userdata = usr_data)
+max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 
 # Создание объектов
-language_change_B = Button(root, text = "{0}".format(language_data['name_lang']))
-version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
+language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
+version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 25)
 bit_progressbar = ttk.Progressbar(root, length = 570)
 bit_progressbar["value"] = percentage_progress_user
 bit_progressbar_value_text = Label(root, text = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"]))
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_text_window"]["feed_the_cat"]))
+notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 74)
+# Объекты для разрабочика
+if "-dev" in sys.argv:
+	text_info_multipliers = Label(root, text = "\"multiplier-start-value\": {0}\n\"multiplier-money\": {1}".format(usr_data["save"]["multiplier-start-value"], usr_data["save"]["multiplier-money"]))
 
 # Логикa
 def language_change_click(event):
@@ -90,16 +97,59 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 
 	root.quit()
 
+def feed_the_cat_button(event):
+	global usr_data
+	if config_data["eat-dir"] in os.listdir(path = "."):
+		dush_dir = str(str(os.getcwd()) + "\\" + str(config_data["eat-dir"])) + "\\"
+		dush_file = os.listdir(path = dush_dir)
+		if int(len(dush_file)) != 0:
+			size_files = 0
+			wag = 0
+			max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
+			errors_handlers = False
+			while wag != int(len(dush_file)):
+				if os.path.isfile(str(dush_dir) + str(dush_file[wag])):
+					if int(max_start_value_progress) >= size_files:
+						size_files += int(os.path.getsize((str(dush_dir) + str(dush_file[wag]))))
+						os.remove((str(dush_dir) + str(dush_file[wag])), dir_fd = None)
+					else:
+						errors_handlers = True
+						break
+				wag += 1
+			if errors_handlers != True:
+				usr_data["save"]["you-user"] += size_files
+				max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
+				bit_progressbar["value"] = percentage_progress_user
+				bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
+				money_vaule_text["text"] = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"])
+				notification_bar["text"] = str(language_data["successfully"]["cat_ate"])
+			else:
+				notification_bar["text"] = str(language_data["errors_feed"]["many_files"])
+		else:
+			notification_bar["text"] = str(language_data["errors_feed"]["not_files_in_dir"])
+	else:
+		os.mkdir("{0}".format(config_data["eat-dir"]), mode = 0o777, dir_fd = None)
+		max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
+		bit_progressbar["value"] = percentage_progress_user
+		bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
+		money_vaule_text["text"] = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"])
+		notification_bar["text"] = str(language_data["errors_feed"]["not_dir"])
+
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
+button_feed_the_cat.bind('<Button-1>', feed_the_cat_button)
 
 # Выгрузка объектов на экран
 language_change_B.place(x = 5, y = 5)
-version_text_var.place(x = 5, y = 580)
+version_text_var.place(x = 0, y = 110)
 bit_progressbar.place(x = 100, y = 5)
 bit_progressbar_value_text.place(x = 100, y = 30)
 money_vaule_text.place(x = 100, y = 50)
+button_feed_the_cat.place(x = 5, y = 75)
+notification_bar.place(x = 180, y = 110)
+if "-dev" in sys.argv:
+	text_info_multipliers.place(x = 500, y = 30)
 
 root.mainloop()
 with open('user_data.json', "w") as user_data_file:
-	json.dump(userdata, user_data_file)
+	json.dump(usr_data, user_data_file)
