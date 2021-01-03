@@ -34,7 +34,7 @@ root.title("{0}".format(language_data["name_window"])) # Имя окна
 # Обрабочик
 def handler_progress():
 	global usr_data
-	if usr_data["save"]["start-value"] <= usr_data["save"]["you-user"]:
+	if (usr_data["save"]["start-value"] * usr_data["save"]["multiplier-start-value"]) <= usr_data["save"]["you-user"]:
 		usr_data["save"]["multiplier-start-value"] += usr_data["setting"]["speed-rise-multiplier-start-value"]
 		usr_data["save"]["money"] += (usr_data["setting"]["start-money-for-lvl"] * usr_data["save"]["multiplier-money"])
 		usr_data["save"]["multiplier-money"] += usr_data["setting"]["speed-rise-multiplier-money"]
@@ -109,8 +109,8 @@ def feed_the_cat_button(event):
 			errors_handlers = False
 			while wag != int(len(dush_file)):
 				if os.path.isfile(str(dush_dir) + str(dush_file[wag])):
+					size_files += int(os.path.getsize((str(dush_dir) + str(dush_file[wag]))))
 					if int(max_start_value_progress) >= size_files:
-						size_files += int(os.path.getsize((str(dush_dir) + str(dush_file[wag]))))
 						os.remove((str(dush_dir) + str(dush_file[wag])), dir_fd = None)
 					else:
 						errors_handlers = True
