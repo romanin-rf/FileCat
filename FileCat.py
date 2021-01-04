@@ -29,7 +29,9 @@ with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as
 root = Tk() # Создание окна
 root.geometry('{0}x{1}'.format(config_data["window"][0], config_data["window"][1])) # Размер окна
 root.resizable(width = False, height = False) # Блокировка размера окна, чтобы его нельзя было изменить
+root.iconbitmap('icon.ico')
 root.title("{0}".format(language_data["name_window"])) # Имя окна
+
 
 # Обрабочик
 def handler_progress():
