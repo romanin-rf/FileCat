@@ -4,8 +4,10 @@ import json
 import time
 import math
 import tkinter
+import webbrowser
 import tkinter.ttk as ttk
 from tkinter import *
+from PIL import ImageTk, Image
 
 def calculate_whole_percentage(max_var, var, percent):
 	one_percentage = max_var / percent
@@ -32,6 +34,7 @@ root.resizable(width = False, height = False) # Блокировка разме�
 root.iconbitmap('icon.ico')
 root.title("{0}".format(language_data["name_window"])) # Имя окна
 
+githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(os.getcwd())))
 
 # Обрабочик
 def handler_progress():
@@ -51,12 +54,13 @@ max_start_value_progress, value_progress_user, percentage_progress_user = handle
 # Создание объектов
 language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
 version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 25)
-bit_progressbar = ttk.Progressbar(root, length = 570)
+bit_progressbar = ttk.Progressbar(root, length = 595)
 bit_progressbar["value"] = percentage_progress_user
 bit_progressbar_value_text = Label(root, text = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"]))
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_text_window"]["feed_the_cat"]))
 notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 74)
+github_link = Label(root, image = githun_img)
 # Объекты для разрабочика
 if "-dev" in sys.argv:
 	text_info_multipliers = Label(root, text = "\"multiplier-start-value\": {0}\n\"multiplier-money\": {1}".format(usr_data["save"]["multiplier-start-value"], usr_data["save"]["multiplier-money"]))
@@ -137,9 +141,13 @@ def feed_the_cat_button(event):
 		money_vaule_text["text"] = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"])
 		notification_bar["text"] = str(language_data["errors_feed"]["not_dir"])
 
+def github_open_link(event):
+	webbrowser.open_new("https://github.com/romanin-rf/FileCat/releases")
+
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
 button_feed_the_cat.bind('<Button-1>', feed_the_cat_button)
+github_link.bind('<Button-1>', github_open_link)
 
 # Выгрузка объектов на экран
 language_change_B.place(x = 5, y = 5)
@@ -149,6 +157,7 @@ bit_progressbar_value_text.place(x = 100, y = 30)
 money_vaule_text.place(x = 100, y = 50)
 button_feed_the_cat.place(x = 5, y = 75)
 notification_bar.place(x = 180, y = 110)
+github_link.place(x = 660, y = 70)
 if "-dev" in sys.argv:
 	text_info_multipliers.place(x = 500, y = 30)
 
