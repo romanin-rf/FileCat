@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import base64
 import time
 import math
 import tkinter
@@ -23,7 +24,8 @@ with open('config.json') as cnfFILE:
 	config_data = json.load(cnfFILE)
 
 with open('user_data.json') as user_data_file:
-	usr_data = json.load(user_data_file)
+	usr_data_base = json.load(user_data_file)
+usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
 
 with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
 	language_data = json.load(LANGFILE)
@@ -45,8 +47,9 @@ def handler_progress():
 		usr_data["save"]["multiplier-money"] += usr_data["setting"]["speed-rise-multiplier-money"]
 	max_start_value = usr_data["save"]["start-value"] * usr_data["save"]["multiplier-start-value"]
 	progress_percentage = calculate_whole_percentage(max_var = max_start_value, var = usr_data["save"]["you-user"], percent = 100)
+	usr_data_base = base64.urlsafe_b64encode(json.dumps(usr_data).encode()).decode()
 	with open('user_data.json', "w") as user_data_file:
-		json.dump(usr_data, user_data_file)
+		json.dump(usr_data_base, user_data_file)
 	return max_start_value, usr_data["save"]["you-user"], progress_percentage
 
 max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
@@ -162,5 +165,6 @@ if "-dev" in sys.argv:
 	text_info_multipliers.place(x = 500, y = 30)
 
 root.mainloop()
+usr_data_base = base64.urlsafe_b64encode(json.dumps(usr_data).encode()).decode()
 with open('user_data.json', "w") as user_data_file:
-	json.dump(usr_data, user_data_file)
+	json.dump(usr_data_base, user_data_file)
