@@ -10,6 +10,8 @@ import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
 
+dev_sintax = ["-dev", "-ml", "-w", "-h", "-t"]
+
 def calculate_whole_percentage(max_var, var, percent):
 	one_percentage = max_var / percent
 	not_whole_output = var / one_percentage
@@ -30,12 +32,22 @@ usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
 with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
 	language_data = json.load(LANGFILE)
 
-root = Tk() # Создание окна
-root.geometry('{0}x{1}'.format(config_data["window"][0], config_data["window"][1])) # Размер окна
-root.resizable(width = False, height = False) # Блокировка размера окна, чтобы его нельзя было изменить
+root = Tk()
+if (dev_sintax[0] in sys.argv) and (dev_sintax[2] in sys.argv) and (dev_sintax[3] in sys.argv):
+	width_root = int(sys.argv[int(sys.argv.index(dev_sintax[2])) + 1])
+	height_root = int(sys.argv[int(sys.argv.index(dev_sintax[3])) + 1])
+	root.geometry('{0}x{1}'.format(width_root, height_root))
+else:
+	root.geometry('700x130')
+root.resizable(width = False, height = False)
 root.iconbitmap('icon.ico')
-root.title("{0}".format(language_data["name_window"])) # Имя окна
+if (dev_sintax[0] in sys.argv) and (dev_sintax[4] in sys.argv):
+	title_root = str(sys.argv[int(sys.argv.index(dev_sintax[4])) + 1])
+	root.title("{0}".format(title_root))
+else:
+	root.title("{0}".format(language_data["name_window"]))
 
+# Выгрузка изображений
 githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(os.getcwd())))
 
 # Обрабочик
@@ -65,7 +77,7 @@ button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_tex
 notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 74)
 github_link = Label(root, image = githun_img)
 # Объекты для разрабочика
-if "-dev" in sys.argv:
+if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers = Label(root, text = "\"multiplier-start-value\": {0}\n\"multiplier-money\": {1}".format(usr_data["save"]["multiplier-start-value"], usr_data["save"]["multiplier-money"]))
 
 # Логикa
@@ -161,7 +173,7 @@ money_vaule_text.place(x = 100, y = 50)
 button_feed_the_cat.place(x = 5, y = 75)
 notification_bar.place(x = 180, y = 110)
 github_link.place(x = 660, y = 70)
-if "-dev" in sys.argv:
+if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers.place(x = 500, y = 30)
 
 root.mainloop()
