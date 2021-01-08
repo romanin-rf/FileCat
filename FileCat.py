@@ -10,6 +10,11 @@ import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
 
+local_dir = os.getcwd()
+os.chdir(path = "..")
+local_dir_dush = os.getcwd()
+os.chdir(path = local_dir)
+
 dev_sintax = ["-dev", "-ml", "-w", "-h", "-t"]
 
 def calculate_whole_percentage(max_var, var, percent):
@@ -22,14 +27,14 @@ def calculate_whole_percentage(max_var, var, percent):
 		output = whole_output
 	return output
 
-with open('config.json') as cnfFILE:
+with open('{0}\\config.json'.format(os.getcwd())) as cnfFILE:
 	config_data = json.load(cnfFILE)
 
-with open('user_data.json') as user_data_file:
+with open('{0}\\user_data.json'.format(os.getcwd())) as user_data_file:
 	usr_data_base = json.load(user_data_file)
 usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
 
-with open('{0}\\languages\\{1}'.format(os.getcwd(), config_data["language"])) as LANGFILE:
+with open('{0}\\languages\\{1}'.format(local_dir, config_data["language"])) as LANGFILE:
 	language_data = json.load(LANGFILE)
 
 root = Tk()
@@ -48,7 +53,7 @@ else:
 	root.title("{0}".format(language_data["name_window"]))
 
 # Выгрузка изображений
-githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(os.getcwd())))
+githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(local_dir)))
 
 # Обрабочик
 def handler_progress():
@@ -82,7 +87,7 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 
 # Логикa
 def language_change_click(event):
-	list_languages = os.listdir(path = "{0}\\languages".format((os.getcwd())))
+	list_languages = os.listdir(path = "{0}\\languages".format((local_dir)))
 
 	id_lang_list = 0
 	while True:
@@ -93,9 +98,9 @@ def language_change_click(event):
 	id_lang_list += 1
 	if id_lang_list == len(list_languages):
 		id_lang_list = 0
-	name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(os.getcwd(), list_languages[id_lang_list]))
+	name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
 	while type_file_lang != ".json":
-		name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(os.getcwd(), list_languages[id_lang_list]))
+		name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
 		if type_file_lang == ".json":
 			break
 		else:
@@ -110,18 +115,18 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 	list_languages = list_langs
 
 	config_data["language"] = list_languages[id_lang_list]
-	with open('config.json', 'w') as cnfFILE:
+	with open('{0}\\config.json'.format(local_dir), 'w') as cnfFILE:
 		json.dump(config_data, cnfFILE)
 
-	with open('config.json') as cnfFILE:
+	with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
 		config_data = json.load(cnfFILE)
 
 	root.quit()
 
 def feed_the_cat_button(event):
 	global usr_data
-	if config_data["eat-dir"] in os.listdir(path = "."):
-		dush_dir = str(str(os.getcwd()) + "\\" + str(config_data["eat-dir"])) + "\\"
+	if config_data["eat-dir"] in os.listdir(path = local_dir_dush):
+		dush_dir = str(str(local_dir_dush) + "\\" + str(config_data["eat-dir"])) + "\\"
 		dush_file = os.listdir(path = dush_dir)
 		if int(len(dush_file)) != 0:
 			size_files = 0
@@ -149,7 +154,7 @@ def feed_the_cat_button(event):
 		else:
 			notification_bar["text"] = str(language_data["errors_feed"]["not_files_in_dir"])
 	else:
-		os.mkdir("{0}".format(config_data["eat-dir"]), mode = 0o777, dir_fd = None)
+		os.mkdir("{0}\\{1}".format(local_dir_dush, config_data["eat-dir"]), mode = 0o777, dir_fd = None)
 		max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 		bit_progressbar["value"] = percentage_progress_user
 		bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
