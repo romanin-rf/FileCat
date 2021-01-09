@@ -128,6 +128,18 @@ def feed_the_cat_button(event):
 	if config_data["eat-dir"] in os.listdir(path = local_dir_dush):
 		dush_dir = str(str(local_dir_dush) + "\\" + str(config_data["eat-dir"])) + "\\"
 		dush_file = os.listdir(path = dush_dir)
+		wag_handler_files = 0
+		while wag_handler_files != int(len(dush_file)):
+			if str(dush_file[wag_handler_files]).endswith(".txt") != True:
+				dush_file.remove(str(dush_file[wag_handler_files]))
+			else:
+				wag_handler_files += 1
+			if dev_sintax[0] in sys.argv:
+				print("-----------------------------------------")
+				print("DUSH_DIR:", dush_dir)
+				print("DUSH_FILE:", dush_file)
+				print("WAG:", wag_handler_files)
+				print("-----------------------------------------")
 		if int(len(dush_file)) != 0:
 			size_files = 0
 			wag = 0
@@ -150,6 +162,10 @@ def feed_the_cat_button(event):
 				money_vaule_text["text"] = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"])
 				notification_bar["text"] = str(language_data["successfully"]["cat_ate"])
 			else:
+				usr_data["save"]["you-user"] = 0
+				max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
+				bit_progressbar["value"] = percentage_progress_user
+				bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
 				notification_bar["text"] = str(language_data["errors_feed"]["many_files"])
 		else:
 			notification_bar["text"] = str(language_data["errors_feed"]["not_files_in_dir"])

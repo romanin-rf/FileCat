@@ -1,4 +1,4 @@
 @echo off
 cls
-python FileCat.py
+python FileCat.py -dev
 pause
