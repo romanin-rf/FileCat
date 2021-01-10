@@ -26,16 +26,25 @@ def calculate_whole_percentage(max_var, var, percent):
 	else:
 		output = whole_output
 	return output
-
-with open('{0}\\config.json'.format(os.getcwd())) as cnfFILE:
-	config_data = json.load(cnfFILE)
-
-with open('{0}\\user_data.json'.format(os.getcwd())) as user_data_file:
-	usr_data_base = json.load(user_data_file)
-usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
-
-with open('{0}\\languages\\{1}'.format(local_dir, config_data["language"])) as LANGFILE:
-	language_data = json.load(LANGFILE)
+if str(sys.platform) == "win32":
+	with open('{0}\\config.json'.format(os.getcwd())) as cnfFILE:
+		config_data = json.load(cnfFILE)
+	with open('{0}\\user_data.json'.format(os.getcwd())) as user_data_file:
+		usr_data_base = json.load(user_data_file)
+	usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
+	with open('{0}\\languages\\{1}'.format(local_dir, config_data["language"])) as LANGFILE:
+		language_data = json.load(LANGFILE)
+else:
+	if str(sys.platform) == "linux":
+		with open('{0}/config.json'.format(os.getcwd())) as cnfFILE:
+			config_data = json.load(cnfFILE)
+		with open('{0}/user_data.json'.format(os.getcwd())) as user_data_file:
+			usr_data_base = json.load(user_data_file)
+		usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
+		with open('{0}/languages/{1}'.format(local_dir, config_data["language"])) as LANGFILE:
+			language_data = json.load(LANGFILE)
+	else:
+		raise OSError("ваша операционная система не поддерживаеться")
 
 root = Tk()
 if (dev_sintax[0] in sys.argv) and (dev_sintax[2] in sys.argv) and (dev_sintax[3] in sys.argv):
@@ -45,7 +54,8 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[2] in sys.argv) and (dev_sintax[3
 else:
 	root.geometry('700x130')
 root.resizable(width = False, height = False)
-root.iconbitmap('icon.ico')
+if str(sys.platform) == "win32":
+	root.iconbitmap('icon.ico')
 if (dev_sintax[0] in sys.argv) and (dev_sintax[4] in sys.argv):
 	title_root = str(sys.argv[int(sys.argv.index(dev_sintax[4])) + 1])
 	root.title("{0}".format(title_root))
@@ -53,7 +63,11 @@ else:
 	root.title("{0}".format(language_data["name_window"]))
 
 # Выгрузка изображений
-githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(local_dir)))
+if str(sys.platform) == "win32":
+	githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(local_dir)))
+else:
+	if str(sys.platform) == "linux":
+		githun_img = ImageTk.PhotoImage(Image.open("{0}/data/img/github.png".format(local_dir)))
 
 # Обрабочик
 def handler_progress():
@@ -72,14 +86,20 @@ def handler_progress():
 max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 
 # Создание объектов
-language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
-version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 25)
+if str(sys.platform) == "win32":
+	language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
+	version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 25)
+	notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 74)
+else:
+	if str(sys.platform) == "linux":
+		language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 8)
+		version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 22)
+		notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 65)
 bit_progressbar = ttk.Progressbar(root, length = 595)
 bit_progressbar["value"] = percentage_progress_user
 bit_progressbar_value_text = Label(root, text = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"]))
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_text_window"]["feed_the_cat"]))
-notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 74)
 github_link = Label(root, image = githun_img)
 # Объекты для разрабочика
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
@@ -87,7 +107,11 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 
 # Логикa
 def language_change_click(event):
-	list_languages = os.listdir(path = "{0}\\languages".format((local_dir)))
+	if str(sys.platform) == "win32":
+		list_languages = os.listdir(path = "{0}\\languages".format((local_dir)))
+	else:
+		if str(sys.platform) == "linux":
+			list_languages = os.listdir(path = "{0}/languages".format((local_dir)))
 
 	id_lang_list = 0
 	while True:
@@ -98,15 +122,27 @@ def language_change_click(event):
 	id_lang_list += 1
 	if id_lang_list == len(list_languages):
 		id_lang_list = 0
-	name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
-	while type_file_lang != ".json":
+	if str(sys.platform) == "win32":
 		name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
-		if type_file_lang == ".json":
-			break
-		else:
-			if id_lang_list == len(list_languages):
-				id_lang_list = 0
-		id_lang_list += 1
+		while type_file_lang != ".json":
+			name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
+			if type_file_lang == ".json":
+				break
+			else:
+				if id_lang_list == len(list_languages):
+					id_lang_list = 0
+			id_lang_list += 1
+	else:
+		if str(sys.platform) == "linux":
+			name_file_lang, type_file_lang = os.path.splitext("{0}/languages/{1}".format(local_dir, list_languages[id_lang_list]))
+			while type_file_lang != ".json":
+				name_file_lang, type_file_lang = os.path.splitext("{0}/languages/{1}".format(local_dir, list_languages[id_lang_list]))
+				if type_file_lang == ".json":
+					break
+				else:
+					if id_lang_list == len(list_languages):
+						id_lang_list = 0
+				id_lang_list += 1
 
 	loading_text_language(event, id_lang_list, list_languages, config_data)
 
@@ -115,18 +151,30 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 	list_languages = list_langs
 
 	config_data["language"] = list_languages[id_lang_list]
-	with open('{0}\\config.json'.format(local_dir), 'w') as cnfFILE:
-		json.dump(config_data, cnfFILE)
+	if str(sys.platform) == "win32":
+		with open('{0}\\config.json'.format(local_dir), 'w') as cnfFILE:
+			json.dump(config_data, cnfFILE)
 
-	with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
-		config_data = json.load(cnfFILE)
+		with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
+			config_data = json.load(cnfFILE)
+	else:
+		if str(sys.platform) == "linux":
+			with open('{0}/config.json'.format(local_dir), 'w') as cnfFILE:
+				json.dump(config_data, cnfFILE)
+
+			with open('{0}/config.json'.format(local_dir)) as cnfFILE:
+				config_data = json.load(cnfFILE)
 
 	root.quit()
 
 def feed_the_cat_button(event):
 	global usr_data
 	if config_data["eat-dir"] in os.listdir(path = local_dir_dush):
-		dush_dir = str(str(local_dir_dush) + "\\" + str(config_data["eat-dir"])) + "\\"
+		if str(sys.platform) == "win32":
+			dush_dir = str(str(local_dir_dush) + "\\" + str(config_data["eat-dir"])) + "\\"
+		else:
+			if str(sys.platform) == "linux":
+				dush_dir = str(str(local_dir_dush) + "/" + str(config_data["eat-dir"])) + "/"
 		dush_file = os.listdir(path = dush_dir)
 		wag_handler_files = 0
 		while wag_handler_files != int(len(dush_file)):
