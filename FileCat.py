@@ -7,6 +7,7 @@ import math
 import tkinter
 import webbrowser
 import wget
+import zipfile
 import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
@@ -56,7 +57,7 @@ if str(sys.platform) == "win32":
 	else:
 		working_dir_msgb = False
 	if dev_sintax[0] in sys.argv:
-		print("WORKING_DIR_MSGB:", working_dir_msgb)
+		print("- WORKING_DIR_MSGB:", working_dir_msgb)
 
 # Загрузка данных
 if str(sys.platform) == "win32":
@@ -81,18 +82,29 @@ else:
 
 # Вывод параметров для разрабочика
 if dev_sintax[0] in sys.argv:
-	print("LANGUAGE:", config_data["language"])
-	print("VERSION:", config_data["version"])
-	print("VERSION_API:", config_data["version-api"])
-	print("ARGV:", sys.argv)
+	print("- LANGUAGE:", config_data["language"])
+	print("- VERSION:", config_data["version"])
+	print("- VERSION_API:", config_data["version-api"])
+	print("- ARGV:", sys.argv)
 
 # Проверка обновления
 NeedUpdateData, URLUpdate = UpdateCheck(cfgd = config_data)
-if (str(sys.platform) == "win32") and (working_dir_msgb == True):
+if (str(sys.platform) == "win32") and (working_dir_msgb == True) and (NeedUpdateData == True) and (URLUpdate != None):
 	NumberButtonPress = int(os.popen("\"{0}\" -msg \"FileCat.exe\" \"A new update has been released! Update the program?\" 68".format(dir_msgb)).read())
 	if NumberButtonPress == 6:
-		pass
-		# ДОПИСАТЬ UPDATE
+		os.chdir(path = local_dir_dush)
+		name_file_update = str(wget.download(str(URLUpdate)))
+		if zipfile.is_zipfile(name_file_update):
+			zipfile.ZipFile(str(name_file_update), 'r').extractall()
+			exit()
+		else:
+			os.system("\"{0}\" -msg \"FileCat.exe\" \"Failed to update the program! Go to the developer's website and download the updated version\" 16".format(dir_msgb))
+			os.remove(name_file_update)
+			exit()
+
+if dev_sintax[0] in sys.argv:
+	print("\n- NeedUpdateData:", NeedUpdateData)
+	print("- URLUpdate:", URLUpdate)
 
 # Создание окна
 root = Tk()
