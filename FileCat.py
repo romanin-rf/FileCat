@@ -6,6 +6,7 @@ import time
 import math
 import tkinter
 import webbrowser
+import wget
 import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
@@ -17,6 +18,7 @@ os.chdir(path = local_dir)
 
 dev_sintax = ["-dev", "-ml", "-w", "-h", "-t"]
 
+# Создание функций
 def calculate_whole_percentage(max_var, var, percent):
 	one_percentage = max_var / percent
 	not_whole_output = var / one_percentage
@@ -26,6 +28,37 @@ def calculate_whole_percentage(max_var, var, percent):
 	else:
 		output = whole_output
 	return output
+
+def UpdateCheck(cfgd):
+	NameFileUpdateAPI = str(wget.download(cfgd["url"]))
+	if str(sys.platform) == "win32":
+		with open(str(local_dir) + "\\" + NameFileUpdateAPI) as FileDataUpdate:
+			UpdateAPIData = json.load(FileDataUpdate)
+		os.remove(str(local_dir) + "\\" + NameFileUpdateAPI)
+	else:
+		if str(sys.platform) == "linux":
+			with open(str(local_dir) + "/" + NameFileUpdateAPI) as FileDataUpdate:
+				UpdateAPIData = json.load(FileDataUpdate)
+			os.remove(str(local_dir) + "/" + NameFileUpdateAPI)
+		else:
+			raise OSError("ваша операционная система не поддерживаеться")
+	if UpdateAPIData["version-api"] > cfgd["version-api"]:
+		NeedUpdate = True
+	else:
+		NeedUpdate = False
+	return NeedUpdate, UpdateAPIData["url"]
+
+# Проверка наличия MSGBox
+if str(sys.platform) == "win32":
+	dir_msgb = local_dir + "\\data\\bin\\win32\\msgb.exe"
+	if os.path.exists(dir_msgb):
+		working_dir_msgb = True
+	else:
+		working_dir_msgb = False
+	if dev_sintax[0] in sys.argv:
+		print("WORKING_DIR_MSGB:", working_dir_msgb)
+
+# Загрузка данных
 if str(sys.platform) == "win32":
 	with open('{0}\\config.json'.format(os.getcwd())) as cnfFILE:
 		config_data = json.load(cnfFILE)
@@ -46,6 +79,22 @@ else:
 	else:
 		raise OSError("ваша операционная система не поддерживаеться")
 
+# Вывод параметров для разрабочика
+if dev_sintax[0] in sys.argv:
+	print("LANGUAGE:", config_data["language"])
+	print("VERSION:", config_data["version"])
+	print("VERSION_API:", config_data["version-api"])
+	print("ARGV:", sys.argv)
+
+# Проверка обновления
+NeedUpdateData, URLUpdate = UpdateCheck(cfgd = config_data)
+if (str(sys.platform) == "win32") and (working_dir_msgb == True):
+	NumberButtonPress = int(os.popen("\"{0}\" -msg \"FileCat.exe\" \"A new update has been released! Update the program?\" 68".format(dir_msgb)).read())
+	if NumberButtonPress == 6:
+		pass
+		# ДОПИСАТЬ UPDATE
+
+# Создание окна
 root = Tk()
 if (dev_sintax[0] in sys.argv) and (dev_sintax[2] in sys.argv) and (dev_sintax[3] in sys.argv):
 	width_root = int(sys.argv[int(sys.argv.index(dev_sintax[2])) + 1])
@@ -60,7 +109,10 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[4] in sys.argv):
 	title_root = str(sys.argv[int(sys.argv.index(dev_sintax[4])) + 1])
 	root.title("{0}".format(title_root))
 else:
-	root.title("{0}".format(language_data["name_window"]))
+	if dev_sintax[0] in sys.argv:
+		root.title("{0} - Developer Mode".format(language_data["name_window"]))
+	else:
+		root.title("{0}".format(language_data["name_window"]))
 
 # Выгрузка изображений
 if str(sys.platform) == "win32":
@@ -69,7 +121,7 @@ else:
 	if str(sys.platform) == "linux":
 		githun_img = ImageTk.PhotoImage(Image.open("{0}/data/img/github.png".format(local_dir)))
 
-# Обрабочик
+# Обрабочик прогресса
 def handler_progress():
 	global usr_data
 	if (usr_data["save"]["start-value"] * usr_data["save"]["multiplier-start-value"]) <= usr_data["save"]["you-user"]:
@@ -183,11 +235,9 @@ def feed_the_cat_button(event):
 			else:
 				wag_handler_files += 1
 			if dev_sintax[0] in sys.argv:
-				print("-----------------------------------------")
 				print("DUSH_DIR:", dush_dir)
 				print("DUSH_FILE:", dush_file)
 				print("WAG:", wag_handler_files)
-				print("-----------------------------------------")
 		if int(len(dush_file)) != 0:
 			size_files = 0
 			wag = 0
