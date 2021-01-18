@@ -8,6 +8,7 @@ import tkinter
 import webbrowser
 import wget
 import zipfile
+import ctypes
 import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
@@ -49,16 +50,6 @@ def UpdateCheck(cfgd):
 		NeedUpdate = False
 	return NeedUpdate, UpdateAPIData["url"]
 
-# Проверка наличия MSGBox
-if str(sys.platform) == "win32":
-	dir_msgb = local_dir + "\\data\\bin\\win32\\msgb.exe"
-	if os.path.exists(dir_msgb):
-		working_dir_msgb = True
-	else:
-		working_dir_msgb = False
-	if dev_sintax[0] in sys.argv:
-		print("- WORKING_DIR_MSGB:", working_dir_msgb)
-
 # Загрузка данных
 if str(sys.platform) == "win32":
 	with open('{0}\\config.json'.format(os.getcwd())) as cnfFILE:
@@ -89,8 +80,8 @@ if dev_sintax[0] in sys.argv:
 
 # Проверка обновления
 NeedUpdateData, URLUpdate = UpdateCheck(cfgd = config_data)
-if (str(sys.platform) == "win32") and (working_dir_msgb == True) and (NeedUpdateData == True) and (URLUpdate != None):
-	NumberButtonPress = int(os.popen("\"{0}\" -msg \"FileCat.exe\" \"A new update has been released! Update the program?\" 68".format(dir_msgb)).read())
+if (str(sys.platform) == "win32") and (NeedUpdateData == True) and (URLUpdate != None):
+	NumberButtonPress = int(ctypes.windll.user32.MessageBoxW(0, "A new update has been released! Update the program?", "File Cat", 68))
 	if NumberButtonPress == 6:
 		os.chdir(path = local_dir_dush)
 		name_file_update = str(wget.download(str(URLUpdate)))
@@ -98,13 +89,13 @@ if (str(sys.platform) == "win32") and (working_dir_msgb == True) and (NeedUpdate
 			zipfile.ZipFile(str(name_file_update), 'r').extractall()
 			exit()
 		else:
-			os.system("\"{0}\" -msg \"FileCat.exe\" \"Failed to update the program! Go to the developer's website and download the updated version\" 16".format(dir_msgb))
+			ctypes.windll.user32.MessageBoxW(0, "Failed to update the program! Go to the developer's website and download the updated version", "File Cat", 16)
 			os.remove(name_file_update)
 			exit()
 
 if dev_sintax[0] in sys.argv:
 	print("\n- NeedUpdateData:", NeedUpdateData)
-	print("- URLUpdate:", URLUpdate)
+	print("- URLUpdate: \"" + str(URLUpdate) + "\"")
 
 # Создание окна
 root = Tk()
