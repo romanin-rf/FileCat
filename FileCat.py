@@ -18,7 +18,7 @@ os.chdir(path = "..")
 local_dir_dush = os.getcwd()
 os.chdir(path = local_dir)
 
-dev_sintax = ["-dev", "-ml", "-w", "-h", "-t"]
+dev_sintax = ["-dev", "-ml", "-w", "-h", "-t", "-cmdl"]
 
 # Создание функций
 def calculate_whole_percentage(max_var, var, percent):
@@ -86,6 +86,7 @@ if (str(sys.platform) == "win32") and (NeedUpdateData == True) and (URLUpdate !=
 		os.chdir(path = local_dir_dush)
 		name_file_update = str(wget.download(str(URLUpdate)))
 		if zipfile.is_zipfile(name_file_update):
+			ctypes.windll.user32.MessageBoxW(0, "The File Cat downloaded the update and after installing the application will give you an error, this is normal and means the program has been updated", "File Cat", 16)
 			zipfile.ZipFile(str(name_file_update), 'r').extractall()
 			exit()
 		else:
@@ -159,6 +160,9 @@ github_link = Label(root, image = githun_img)
 # Объекты для разрабочика
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers = Label(root, text = "\"multiplier-start-value\": {0}\n\"multiplier-money\": {1}".format(usr_data["save"]["multiplier-start-value"], usr_data["save"]["multiplier-money"]))
+if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
+	command_line_devepoler = Entry(root, width = 108)
+	command_line_devepoler_enter = Button(root, text = ">>>")
 
 # Логикa
 def language_change_click(event):
@@ -281,10 +285,24 @@ def feed_the_cat_button(event):
 def github_open_link(event):
 	webbrowser.open_new("https://github.com/romanin-rf/FileCat/releases")
 
+def handler_command_line(event):
+	command_developer_user = str(command_line_devepoler.get())
+	try:
+		user_output_command = eval(str(command_developer_user))
+		ctypes.windll.user32.MessageBoxW(0, (("Вход:\n{0}\n\nВывод:\n".format(command_developer_user)) + str(user_output_command)), str(sys.argv[0]), 64)
+	except:
+		try:
+			user_output_command = exec(str(command_developer_user))
+			ctypes.windll.user32.MessageBoxW(0, (("Вход:\n{0}\n\nВывод:\n".format(command_developer_user)) + str(user_output_command)), str(sys.argv[0]), 64)
+		except:
+			ctypes.windll.user32.MessageBoxW(0, "При вводе этой команды:\n{0}\n\n!!! ПРОИЗОШЛА ОШИБКА !!!".format(command_developer_user), str(sys.argv[0]), 16)
+
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
 button_feed_the_cat.bind('<Button-1>', feed_the_cat_button)
 github_link.bind('<Button-1>', github_open_link)
+if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
+	command_line_devepoler_enter.bind('<Button-1>', handler_command_line)
 
 # Выгрузка объектов на экран
 language_change_B.place(x = 5, y = 5)
@@ -297,6 +315,9 @@ notification_bar.place(x = 180, y = 110)
 github_link.place(x = 660, y = 70)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers.place(x = 500, y = 30)
+if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
+	command_line_devepoler.place(x = 5, y = 140)
+	command_line_devepoler_enter.place(x = 660, y = 135)
 
 root.mainloop()
 usr_data_base = base64.urlsafe_b64encode(json.dumps(usr_data).encode()).decode()
