@@ -18,6 +18,8 @@ local_dir = os.getcwd()
 os.chdir(path = "..")
 local_dir_dush = os.getcwd()
 os.chdir(path = local_dir)
+root_about = None
+about_window_first_open = False
 
 dev_sintax = ["-dev", "-ml", "-w", "-h", "-t", "-cmdl"]
 
@@ -171,9 +173,11 @@ else:
 # Выгрузка изображений
 if str(sys.platform) == "win32":
 	githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(local_dir)))
+	icon_about_win = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\icon64.png".format(local_dir)))
 else:
 	if str(sys.platform) == "linux":
 		githun_img = ImageTk.PhotoImage(Image.open("{0}/data/img/github.png".format(local_dir)))
+		icon_about_win = ImageTk.PhotoImage(Image.open("{0}/data/img/icon64.png".format(local_dir)))
 
 # Обрабочик прогресса
 def handler_progress():
@@ -194,19 +198,18 @@ max_start_value_progress, value_progress_user, percentage_progress_user = handle
 # Создание объектов
 if str(sys.platform) == "win32":
 	language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
-	version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 25)
-	notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 74)
+	notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 100)
 else:
 	if str(sys.platform) == "linux":
 		language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 8)
-		version_text_var = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]), bg = "black", fg = "white", width = 22)
-		notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 65)
+		notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 88)
 bit_progressbar = ttk.Progressbar(root, length = 595)
 bit_progressbar["value"] = percentage_progress_user
 bit_progressbar_value_text = Label(root, text = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"]))
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_text_window"]["feed_the_cat"]))
 github_link = Label(root, image = githun_img)
+about_program = Button(root, text = str(language_data["button_text_window"]["about_program"]))
 # Объекты для разрабочика
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers = Label(root, text = "\"multiplier-start-value\": {0}\n\"multiplier-money\": {1}".format(usr_data["save"]["multiplier-start-value"], usr_data["save"]["multiplier-money"]))
@@ -333,7 +336,7 @@ def feed_the_cat_button(event):
 		notification_bar["text"] = str(language_data["errors_feed"]["not_dir"])
 
 def github_open_link(event):
-	webbrowser.open_new("https://github.com/romanin-rf/FileCat/releases")
+	webbrowser.open_new("https://github.com/romanin-rf/FileCat")
 
 def handler_command_line(event):
 	global config_data, usr_data
@@ -351,22 +354,64 @@ def handler_command_line(event):
 			else:	
 				ctypes.windll.user32.MessageBoxW(0, "При вводе этой команды:\n{0}\n\n!!! ПРОИЗОШЛА ОШИБКА !!!".format(command_developer_user), str(sys.argv[0]), 16)
 
+def about_window(event):
+	global root_about
+	root_about = Toplevel(root)
+	root_about.title((str(language_data["name_window"]) + " - " + str(language_data["about_win"]["title"])))
+	root_about.resizable(width = False, height = False)
+	root_about.iconbitmap('icon.ico')
+	root_about.geometry('335x125')
+	icon_about_win_label = Label(root_about, image = icon_about_win)
+	if not(len(language_data["about_win"]["developers"]) > 1):
+		developer_list = Label(root_about, text = "{0}\n* {1} *".format(language_data["about_win"]["developer_text"], language_data["about_win"]["developers"][0]))
+	else:
+		text_developer_list = ""
+		wag = 0
+		while wag != len(language_data["about_win"]["developers"]):
+			text_developer_list += ("* " + str(language_data["about_win"]["developers"][wag]) + " *\n")
+			wag += 1
+		developer_list = Label(root_about, text = "{0}\n{1}".format(language_data["about_win"]["developers_text"], text_developer_list))
+	if not(len(language_data["about_win"]["testers"]) > 1):
+		testers_list = Label(root_about, text = "{0}\n* {1} *".format(language_data["about_win"]["tester_text"], language_data["about_win"]["tester_text"][0]))
+	else:
+		text_testers_list = ""
+		wag = 0
+		while wag != len(language_data["about_win"]["testers"]):
+			text_testers_list += ("* " + str(language_data["about_win"]["testers"][wag]) + " *\n")
+			wag += 1
+		testers_list = Label(root_about, text = "{0}\n{1}".format(language_data["about_win"]["testers_text"], text_testers_list))
+	version_label = Label(root_about, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
+	icon_about_win_label.place(x = 5, y = 5)
+	version_label.place(x = 80, y = 5)
+	developer_list.place(x = 80, y = 25)
+	testers_list.place(x = 80, y = 65)
+
+def handler_about_window(event):
+	global about_window_first_open
+	if about_window_first_open == False:
+		about_window_first_open = True
+		about_window(event)
+	else:
+		if not(int(root_about.winfo_exists()) == 1):
+			about_window(event)
+
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
 button_feed_the_cat.bind('<Button-1>', feed_the_cat_button)
 github_link.bind('<Button-1>', github_open_link)
+about_program.bind('<Button-1>', handler_about_window)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
 	command_line_devepoler_enter.bind('<Button-1>', handler_command_line)
 
 # Выгрузка объектов на экран
 language_change_B.place(x = 5, y = 5)
-version_text_var.place(x = 0, y = 110)
 bit_progressbar.place(x = 100, y = 5)
 bit_progressbar_value_text.place(x = 100, y = 30)
 money_vaule_text.place(x = 100, y = 50)
 button_feed_the_cat.place(x = 5, y = 75)
-notification_bar.place(x = 180, y = 110)
+notification_bar.place(x = 0, y = 110)
 github_link.place(x = 660, y = 70)
+about_program.place(x = 610, y = 30)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers.place(x = 500, y = 30)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
