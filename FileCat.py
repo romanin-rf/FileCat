@@ -3,6 +3,7 @@ import sys
 import json
 import base64
 import time
+import datetime
 import math
 import tkinter
 import webbrowser
@@ -43,7 +44,7 @@ def UpdateCheck(cfgd):
 				UpdateAPIData = json.load(FileDataUpdate)
 			os.remove(str(local_dir) + "/" + NameFileUpdateAPI)
 		else:
-			raise OSError("ваша операционная система не поддерживаеться")
+			raise OSError("Your OS is not supported")
 	if UpdateAPIData["version-api"] > cfgd["version-api"]:
 		NeedUpdate = True
 	else:
@@ -69,7 +70,49 @@ else:
 		with open('{0}/languages/{1}'.format(local_dir, config_data["language"])) as LANGFILE:
 			language_data = json.load(LANGFILE)
 	else:
-		raise OSError("ваша операционная система не поддерживаеться")
+		raise OSError("Your OS is not supported")
+
+# Обновления
+def last_check_update():
+	global config_data
+	user_time_start, user_func_time_start = [], datetime.datetime.now()
+
+	last_func_check_update = datetime.datetime(config_data["last-check-update"][2], config_data["last-check-update"][1], config_data["last-check-update"][0], config_data["last-check-update"][3], config_data["last-check-update"][4])
+
+	if str(time.strftime("%d", time.localtime()))[0] == "0":
+		user_time_start.append(int(str(time.strftime("%d", time.localtime()))[1]))
+	else:
+		user_time_start.append(int(time.strftime("%d", time.localtime())))
+	if str(time.strftime("%m", time.localtime()))[0] == "0":
+		user_time_start.append(int(str(time.strftime("%m", time.localtime()))[1]))
+	else:
+		user_time_start.append(int(time.strftime("%m", time.localtime())))
+	user_time_start.append(int(time.strftime("%Y", time.localtime())))
+	if str(time.strftime("%H", time.localtime()))[0] == "0":
+		user_time_start.append(int(str(time.strftime("%H", time.localtime()))[1]))
+	else:
+		user_time_start.append(int(time.strftime("%H", time.localtime())))
+	if str(time.strftime("%M", time.localtime()))[0] == "0":
+		user_time_start.append(int(str(time.strftime("%M", time.localtime()))[1]))
+	else:
+		user_time_start.append(int(time.strftime("%M", time.localtime())))
+
+	passed_last_check_update_seconds = int((user_func_time_start - last_func_check_update).seconds)
+
+	if passed_last_check_update_seconds > 3600:
+		NeedCheckToLastCheck = True
+		config_data["last-check-update"] = user_time_start
+		with open('{0}\\config.json'.format(os.getcwd()), "w") as cnfFILE:
+			json.dump(config_data, cnfFILE)
+	else:
+		NeedCheckToLastCheck = False
+
+	if dev_sintax[0] in sys.argv:
+		print("- USER_TIME_START:", user_time_start)
+		print("- CONFIG_DATA[\"LAST-CHECK-UPDATE\"]:", config_data["last-check-update"])
+		print("- PASSED_LAST_CHECK_UPDATE_SECONDS:", passed_last_check_update_seconds)
+		print("- NEED_CHECK_TO_LAST_CHECK:", NeedCheckToLastCheck)
+	return NeedCheckToLastCheck
 
 # Вывод параметров для разрабочика
 if dev_sintax[0] in sys.argv:
@@ -79,24 +122,31 @@ if dev_sintax[0] in sys.argv:
 	print("- ARGV:", sys.argv)
 
 # Проверка обновления
-NeedUpdateData, URLUpdate = UpdateCheck(cfgd = config_data)
-if (str(sys.platform) == "win32") and (NeedUpdateData == True) and (URLUpdate != None):
-	NumberButtonPress = int(ctypes.windll.user32.MessageBoxW(0, "A new update has been released! Update the program?", "File Cat", 68))
-	if NumberButtonPress == 6:
-		os.chdir(path = local_dir_dush)
-		name_file_update = str(wget.download(str(URLUpdate)))
-		if zipfile.is_zipfile(name_file_update):
-			ctypes.windll.user32.MessageBoxW(0, "The File Cat downloaded the update and after installing the application will give you an error, this is normal and means the program has been updated", "File Cat", 16)
-			zipfile.ZipFile(str(name_file_update), 'r').extractall()
-			exit()
-		else:
-			ctypes.windll.user32.MessageBoxW(0, "Failed to update the program! Go to the developer's website and download the updated version", "File Cat", 16)
-			os.remove(name_file_update)
-			exit()
+try:
+	if bool(last_check_update()) == True:
+		NeedUpdateData, URLUpdate = UpdateCheck(cfgd = config_data)
+	else:
+		NeedUpdateData = False
+	if (str(sys.platform) == "win32") and (NeedUpdateData == True) and (URLUpdate != None):
+		NumberButtonPress = int(ctypes.windll.user32.MessageBoxW(0, "A new update has been released! Update the program?", "File Cat", 68))
+		if NumberButtonPress == 6:
+			os.chdir(path = local_dir_dush)
+			name_file_update = str(wget.download(str(URLUpdate)))
+			if zipfile.is_zipfile(name_file_update):
+				ctypes.windll.user32.MessageBoxW(0, "The File Cat downloaded the update and after installing the application will give you an error, this is normal and means the program has been updated", "File Cat", 16)
+				zipfile.ZipFile(str(name_file_update), 'r').extractall()
+				exit()
+			else:
+				ctypes.windll.user32.MessageBoxW(0, "Failed to update the program! Go to the developer's website and download the updated version", "File Cat", 16)
+				os.remove(name_file_update)
+				exit()
+except:
+	ctypes.windll.user32.MessageBoxW(0, "Failed to get update information. Possible problems:\n1. There is no internet connection\n2. The developer provided an incorrect update link", "File Cat", 16)
 
 if dev_sintax[0] in sys.argv:
 	print("\n- NeedUpdateData:", NeedUpdateData)
-	print("- URLUpdate: \"" + str(URLUpdate) + "\"")
+	if NeedUpdateData == True:
+		print("- URLUpdate: \"" + str(URLUpdate) + "\"")
 
 # Создание окна
 root = Tk()
@@ -286,6 +336,7 @@ def github_open_link(event):
 	webbrowser.open_new("https://github.com/romanin-rf/FileCat/releases")
 
 def handler_command_line(event):
+	global config_data, usr_data
 	command_developer_user = str(command_line_devepoler.get())
 	try:
 		user_output_command = eval(str(command_developer_user))
@@ -295,7 +346,10 @@ def handler_command_line(event):
 			user_output_command = exec(str(command_developer_user))
 			ctypes.windll.user32.MessageBoxW(0, (("Вход:\n{0}\n\nВывод:\n".format(command_developer_user)) + str(user_output_command)), str(sys.argv[0]), 64)
 		except:
-			ctypes.windll.user32.MessageBoxW(0, "При вводе этой команды:\n{0}\n\n!!! ПРОИЗОШЛА ОШИБКА !!!".format(command_developer_user), str(sys.argv[0]), 16)
+			if command_developer_user == "exit()":
+				root.quit()
+			else:	
+				ctypes.windll.user32.MessageBoxW(0, "При вводе этой команды:\n{0}\n\n!!! ПРОИЗОШЛА ОШИБКА !!!".format(command_developer_user), str(sys.argv[0]), 16)
 
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
