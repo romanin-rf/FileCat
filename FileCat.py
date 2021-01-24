@@ -14,9 +14,9 @@ import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
 
-local_dir = os.getcwd()
+local_dir = str(os.getcwd())
 os.chdir(path = "..")
-local_dir_dush = os.getcwd()
+local_dir_dush = str(os.getcwd())
 os.chdir(path = local_dir)
 root_about = None
 about_window_first_open = False
@@ -37,14 +37,14 @@ def calculate_whole_percentage(max_var, var, percent):
 def UpdateCheck(cfgd):
 	NameFileUpdateAPI = str(wget.download(cfgd["url"]))
 	if str(sys.platform) == "win32":
-		with open(str(local_dir) + "\\" + NameFileUpdateAPI) as FileDataUpdate:
+		with open(local_dir + "\\" + NameFileUpdateAPI) as FileDataUpdate:
 			UpdateAPIData = json.load(FileDataUpdate)
-		os.remove(str(local_dir) + "\\" + NameFileUpdateAPI)
+		os.remove(local_dir + "\\" + NameFileUpdateAPI)
 	else:
 		if str(sys.platform) == "linux":
-			with open(str(local_dir) + "/" + NameFileUpdateAPI) as FileDataUpdate:
+			with open(local_dir + "/" + NameFileUpdateAPI) as FileDataUpdate:
 				UpdateAPIData = json.load(FileDataUpdate)
-			os.remove(str(local_dir) + "/" + NameFileUpdateAPI)
+			os.remove(local_dir + "/" + NameFileUpdateAPI)
 		else:
 			raise OSError("Your OS is not supported")
 	if UpdateAPIData["version-api"] > cfgd["version-api"]:
@@ -55,18 +55,18 @@ def UpdateCheck(cfgd):
 
 # Загрузка данных
 if str(sys.platform) == "win32":
-	with open('{0}\\config.json'.format(os.getcwd())) as cnfFILE:
+	with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
 		config_data = json.load(cnfFILE)
-	with open('{0}\\user_data.json'.format(os.getcwd())) as user_data_file:
+	with open('{0}\\user_data.json'.format(local_dir)) as user_data_file:
 		usr_data_base = json.load(user_data_file)
 	usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
 	with open('{0}\\languages\\{1}'.format(local_dir, config_data["language"])) as LANGFILE:
 		language_data = json.load(LANGFILE)
 else:
 	if str(sys.platform) == "linux":
-		with open('{0}/config.json'.format(os.getcwd())) as cnfFILE:
+		with open('{0}/config.json'.format(local_dir)) as cnfFILE:
 			config_data = json.load(cnfFILE)
-		with open('{0}/user_data.json'.format(os.getcwd())) as user_data_file:
+		with open('{0}/user_data.json'.format(local_dir)) as user_data_file:
 			usr_data_base = json.load(user_data_file)
 		usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
 		with open('{0}/languages/{1}'.format(local_dir, config_data["language"])) as LANGFILE:
@@ -99,12 +99,12 @@ def last_check_update():
 	else:
 		user_time_start.append(int(time.strftime("%M", time.localtime())))
 
-	passed_last_check_update_seconds = int((user_func_time_start - last_func_check_update).seconds)
+	passed_last_check_update_seconds = (user_func_time_start - last_func_check_update).seconds
 
 	if passed_last_check_update_seconds > 3600:
 		NeedCheckToLastCheck = True
 		config_data["last-check-update"] = user_time_start
-		with open('{0}\\config.json'.format(os.getcwd()), "w") as cnfFILE:
+		with open('{0}\\config.json'.format(local_dir), "w") as cnfFILE:
 			json.dump(config_data, cnfFILE)
 	else:
 		NeedCheckToLastCheck = False
@@ -125,15 +125,15 @@ if dev_sintax[0] in sys.argv:
 
 # Проверка обновления
 try:
-	if bool(last_check_update()) == True:
+	if last_check_update() == True:
 		NeedUpdateData, URLUpdate = UpdateCheck(cfgd = config_data)
 	else:
 		NeedUpdateData = False
-	if (str(sys.platform) == "win32") and (NeedUpdateData == True) and (URLUpdate != None):
+	if (sys.platform == "win32") and (NeedUpdateData == True) and (URLUpdate != None):
 		NumberButtonPress = int(ctypes.windll.user32.MessageBoxW(0, "A new update has been released! Update the program?", "File Cat", 68))
 		if NumberButtonPress == 6:
 			os.chdir(path = local_dir_dush)
-			name_file_update = str(wget.download(str(URLUpdate)))
+			name_file_update = str(wget.download(URLUpdate))
 			if zipfile.is_zipfile(name_file_update):
 				ctypes.windll.user32.MessageBoxW(0, "The File Cat downloaded the update and after installing the application will give you an error, this is normal and means the program has been updated", "File Cat", 16)
 				zipfile.ZipFile(str(name_file_update), 'r').extractall()
@@ -148,18 +148,18 @@ except:
 if dev_sintax[0] in sys.argv:
 	print("\n- NeedUpdateData:", NeedUpdateData)
 	if NeedUpdateData == True:
-		print("- URLUpdate: \"" + str(URLUpdate) + "\"")
+		print("- URLUpdate: \"" + URLUpdate + "\"")
 
 # Создание окна
 root = Tk()
 if (dev_sintax[0] in sys.argv) and (dev_sintax[2] in sys.argv) and (dev_sintax[3] in sys.argv):
-	width_root = int(sys.argv[int(sys.argv.index(dev_sintax[2])) + 1])
-	height_root = int(sys.argv[int(sys.argv.index(dev_sintax[3])) + 1])
+	width_root = sys.argv[int(sys.argv.index(dev_sintax[2])) + 1]
+	height_root = sys.argv[int(sys.argv.index(dev_sintax[3])) + 1]
 	root.geometry('{0}x{1}'.format(width_root, height_root))
 else:
 	root.geometry('700x130')
 root.resizable(width = False, height = False)
-if str(sys.platform) == "win32":
+if sys.platform == "win32":
 	root.iconbitmap('icon.ico')
 if (dev_sintax[0] in sys.argv) and (dev_sintax[4] in sys.argv):
 	title_root = str(sys.argv[int(sys.argv.index(dev_sintax[4])) + 1])
@@ -171,11 +171,11 @@ else:
 		root.title("{0}".format(language_data["name_window"]))
 
 # Выгрузка изображений
-if str(sys.platform) == "win32":
+if sys.platform == "win32":
 	githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(local_dir)))
 	icon_about_win = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\icon64.png".format(local_dir)))
 else:
-	if str(sys.platform) == "linux":
+	if sys.platform == "linux":
 		githun_img = ImageTk.PhotoImage(Image.open("{0}/data/img/github.png".format(local_dir)))
 		icon_about_win = ImageTk.PhotoImage(Image.open("{0}/data/img/icon64.png".format(local_dir)))
 
@@ -196,11 +196,11 @@ def handler_progress():
 max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 
 # Создание объектов
-if str(sys.platform) == "win32":
+if sys.platform == "win32":
 	language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
 	notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 100)
 else:
-	if str(sys.platform) == "linux":
+	if sys.platform == "linux":
 		language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 8)
 		notification_bar = Label(root, text = "", bg = "grey", fg = "white", width = 88)
 bit_progressbar = ttk.Progressbar(root, length = 595)
@@ -218,10 +218,10 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
 
 # Логикa
 def language_change_click(event):
-	if str(sys.platform) == "win32":
+	if sys.platform == "win32":
 		list_languages = os.listdir(path = "{0}\\languages".format((local_dir)))
 	else:
-		if str(sys.platform) == "linux":
+		if sys.platform == "linux":
 			list_languages = os.listdir(path = "{0}/languages".format((local_dir)))
 
 	id_lang_list = 0
@@ -233,7 +233,7 @@ def language_change_click(event):
 	id_lang_list += 1
 	if id_lang_list == len(list_languages):
 		id_lang_list = 0
-	if str(sys.platform) == "win32":
+	if sys.platform == "win32":
 		name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
 		while type_file_lang != ".json":
 			name_file_lang, type_file_lang = os.path.splitext("{0}\\languages\\{1}".format(local_dir, list_languages[id_lang_list]))
@@ -244,7 +244,7 @@ def language_change_click(event):
 					id_lang_list = 0
 			id_lang_list += 1
 	else:
-		if str(sys.platform) == "linux":
+		if sys.platform == "linux":
 			name_file_lang, type_file_lang = os.path.splitext("{0}/languages/{1}".format(local_dir, list_languages[id_lang_list]))
 			while type_file_lang != ".json":
 				name_file_lang, type_file_lang = os.path.splitext("{0}/languages/{1}".format(local_dir, list_languages[id_lang_list]))
@@ -262,14 +262,14 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 	list_languages = list_langs
 
 	config_data["language"] = list_languages[id_lang_list]
-	if str(sys.platform) == "win32":
+	if sys.platform == "win32":
 		with open('{0}\\config.json'.format(local_dir), 'w') as cnfFILE:
 			json.dump(config_data, cnfFILE)
 
 		with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
 			config_data = json.load(cnfFILE)
 	else:
-		if str(sys.platform) == "linux":
+		if sys.platform == "linux":
 			with open('{0}/config.json'.format(local_dir), 'w') as cnfFILE:
 				json.dump(config_data, cnfFILE)
 
@@ -356,7 +356,7 @@ def handler_command_line(event):
 def about_window(event):
 	global root_about
 	root_about = Toplevel(root)
-	root_about.title((str(language_data["name_window"]) + " - " + str(language_data["about_win"]["title"])))
+	root_about.title(language_data["name_window"] + " - " + language_data["about_win"]["title"])
 	root_about.resizable(width = False, height = False)
 	root_about.iconbitmap('icon.ico')
 	root_about.geometry('335x125')
@@ -367,7 +367,7 @@ def about_window(event):
 		text_developer_list = ""
 		wag = 0
 		while wag != len(language_data["about_win"]["developers"]):
-			text_developer_list += ("* " + str(language_data["about_win"]["developers"][wag]) + " *\n")
+			text_developer_list += ("* " + language_data["about_win"]["developers"][wag] + " *\n")
 			wag += 1
 		developer_list = Label(root_about, text = "{0}\n{1}".format(language_data["about_win"]["developers_text"], text_developer_list))
 	if not(len(language_data["about_win"]["testers"]) > 1):
