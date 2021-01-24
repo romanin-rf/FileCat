@@ -208,7 +208,6 @@ bit_progressbar["value"] = percentage_progress_user
 bit_progressbar_value_text = Label(root, text = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"]))
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_text_window"]["feed_the_cat"]))
-github_link = Label(root, image = githun_img)
 about_program = Button(root, text = str(language_data["button_text_window"]["about_program"]))
 # Объекты для разрабочика
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
@@ -381,6 +380,9 @@ def about_window(event):
 			wag += 1
 		testers_list = Label(root_about, text = "{0}\n{1}".format(language_data["about_win"]["testers_text"], text_testers_list))
 	version_label = Label(root_about, text = "{0}: {1}".format(language_data["text_window"]["text_version"], config_data["version"]))
+	github_link = Label(root_about, image = githun_img)
+	github_link.bind('<Button-1>', github_open_link)
+	github_link.place(x = 295, y = 85)
 	icon_about_win_label.place(x = 5, y = 5)
 	version_label.place(x = 80, y = 5)
 	developer_list.place(x = 80, y = 25)
@@ -398,7 +400,6 @@ def handler_about_window(event):
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
 button_feed_the_cat.bind('<Button-1>', feed_the_cat_button)
-github_link.bind('<Button-1>', github_open_link)
 about_program.bind('<Button-1>', handler_about_window)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
 	command_line_devepoler_enter.bind('<Button-1>', handler_command_line)
@@ -410,7 +411,6 @@ bit_progressbar_value_text.place(x = 100, y = 30)
 money_vaule_text.place(x = 100, y = 50)
 button_feed_the_cat.place(x = 5, y = 75)
 notification_bar.place(x = 0, y = 110)
-github_link.place(x = 660, y = 70)
 about_program.place(x = 610, y = 30)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers.place(x = 500, y = 30)
