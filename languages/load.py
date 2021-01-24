@@ -1,34 +1,36 @@
 import json, os
 
+filename = "uk-ukr.json"
+
 data = 	{
-			'name_lang': 	'English',
-			'name_window': 	'File Cat',
-			'text_window': 	{
-								'text_version':		'Version',
-								'text_progress':	'(1) Progress',
-								'text_money':		'(2) Coins',
-								'text_bites': 		'Byte(s)'
+			'name_lang':	'Український',
+			'name_window':	'Файловий Кіт',
+			'text_window':	{
+								'text_version':		'Версія',
+								'text_progress':	'Прогрес',
+								'text_money':		'Монет',
+								'text_bites':		'Байт(ів)'
 							}, 
 			'button_text_window':	{
-										'feed_the_cat': 'Feed',
-										'about_program': 'About program'
+										'feed_the_cat':	'Погодувати',
+										'about_program': 'Про програму'
 									},
 			'errors_feed':	{
-								'not_dir':			'You gave your cat a bowl',
-								'not_files_in_dir':	'You didn\'t put your cat food',
-								'many_files':		'You put your cat too much food and threw up'
+								'not_dir':			'Ви поставили своєму коту миску',
+								'not_files_in_dir':	'Ви не поклали своєму коту їжі',
+								'many_files':		'Ви поклали своєму коту занадто багато їжі і його вирвало'
 							},
 			'successfully':	{
-								'cat_ate':	'Yum-yum-yum'
+								'cat_ate': 'Ням-ням-ням'
 							},
 			'about_win':	{
-								'title': 			'About program',
-								'developers': 		['Roman Slabicky'],
-								'testers':			['Alexander Shabaev', 'Alexander Kolegaev'],
-								'developer_text':	'Developer:',
-								'developers_text':	'Developers:',
-								'tester_text':		'Tester:',
-								'testers_text':		'Testers:'
+								'title':			'Про програму',
+								'developers':		['Роман Слабицкий'],
+								'testers':			['Олександр Шабаєв', 'Олександр Кульгаєв'],
+								'developer_text':	'Розробник:',
+								'developers_text':	'Розробники:',
+								'tester_text':		'Тестувальник:',
+								'testers_text':		'Тестувальники:'
 							}
 }
 # ֍
@@ -40,8 +42,8 @@ RU:
 			'name_window':	'Файловый Кот',
 			'text_window':	{
 								'text_version':		'Версия',
-								'text_progress':	'(1) Прогресс',
-								'text_money':		'(2) Монет',
+								'text_progress':	'Прогресс',
+								'text_money':		'Монет',
 								'text_bites':		'Байт(ов)'
 							}, 
 			'button_text_window':	{
@@ -72,8 +74,8 @@ EN:
 			'name_window': 	'File Cat',
 			'text_window': 	{
 								'text_version':		'Version',
-								'text_progress':	'(1) Progress',
-								'text_money':		'(2) Coins',
+								'text_progress':	'Progress',
+								'text_money':		'Coins',
 								'text_bites': 		'Byte(s)'
 							}, 
 			'button_text_window':	{
@@ -104,8 +106,8 @@ UK:
 			'name_window':	'Файловий Кіт',
 			'text_window':	{
 								'text_version':		'Версія',
-								'text_progress':	'(1) Прогрес',
-								'text_money':		'(2) Монет',
+								'text_progress':	'Прогрес',
+								'text_money':		'Монет',
 								'text_bites':		'Байт(ів)'
 							}, 
 			'button_text_window':	{
@@ -131,9 +133,13 @@ UK:
 							}
 }
 """
-with open('en-eng.json', 'w') as file:
+with open(filename, 'w') as file:
 	json.dump(data, file)
 
+print("--------------------------------------------------")
+print(filename)
+print("--------------------------------------------------")
 print(data)
+print("--------------------------------------------------")
 
 os.system("pause")

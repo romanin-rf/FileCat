@@ -23,6 +23,27 @@ about_window_first_open = False
 
 dev_sintax = ["-dev", "-ml", "-w", "-h", "-t", "-cmdl"]
 
+# Загрузка данных
+if sys.platform == "win32":
+	with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
+		config_data = json.load(cnfFILE)
+	with open('{0}\\user_data.json'.format(local_dir)) as user_data_file:
+		usr_data_base = json.load(user_data_file)
+	usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
+	with open('{0}\\languages\\{1}'.format(local_dir, config_data["language"])) as LANGFILE:
+		language_data = json.load(LANGFILE)
+else:
+	if sys.platform == "linux":
+		with open('{0}/config.json'.format(local_dir)) as cnfFILE:
+			config_data = json.load(cnfFILE)
+		with open('{0}/user_data.json'.format(local_dir)) as user_data_file:
+			usr_data_base = json.load(user_data_file)
+		usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
+		with open('{0}/languages/{1}'.format(local_dir, config_data["language"])) as LANGFILE:
+			language_data = json.load(LANGFILE)
+	else:
+		raise OSError("Your OS is not supported")
+
 # Создание функций
 def calculate_whole_percentage(max_var, var, percent):
 	one_percentage = max_var / percent
@@ -35,13 +56,13 @@ def calculate_whole_percentage(max_var, var, percent):
 	return output
 
 def UpdateCheck(cfgd):
-	NameFileUpdateAPI = str(wget.download(cfgd["url"]))
-	if str(sys.platform) == "win32":
+	NameFileUpdateAPI = wget.download(cfgd["url"])
+	if sys.platform == "win32":
 		with open(local_dir + "\\" + NameFileUpdateAPI) as FileDataUpdate:
 			UpdateAPIData = json.load(FileDataUpdate)
 		os.remove(local_dir + "\\" + NameFileUpdateAPI)
 	else:
-		if str(sys.platform) == "linux":
+		if sys.platform == "linux":
 			with open(local_dir + "/" + NameFileUpdateAPI) as FileDataUpdate:
 				UpdateAPIData = json.load(FileDataUpdate)
 			os.remove(local_dir + "/" + NameFileUpdateAPI)
@@ -52,27 +73,6 @@ def UpdateCheck(cfgd):
 	else:
 		NeedUpdate = False
 	return NeedUpdate, UpdateAPIData["url"]
-
-# Загрузка данных
-if str(sys.platform) == "win32":
-	with open('{0}\\config.json'.format(local_dir)) as cnfFILE:
-		config_data = json.load(cnfFILE)
-	with open('{0}\\user_data.json'.format(local_dir)) as user_data_file:
-		usr_data_base = json.load(user_data_file)
-	usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
-	with open('{0}\\languages\\{1}'.format(local_dir, config_data["language"])) as LANGFILE:
-		language_data = json.load(LANGFILE)
-else:
-	if str(sys.platform) == "linux":
-		with open('{0}/config.json'.format(local_dir)) as cnfFILE:
-			config_data = json.load(cnfFILE)
-		with open('{0}/user_data.json'.format(local_dir)) as user_data_file:
-			usr_data_base = json.load(user_data_file)
-		usr_data = json.loads(base64.urlsafe_b64decode(usr_data_base).decode())
-		with open('{0}/languages/{1}'.format(local_dir, config_data["language"])) as LANGFILE:
-			language_data = json.load(LANGFILE)
-	else:
-		raise OSError("Your OS is not supported")
 
 # Функция последнего обновления
 def last_check_update():
@@ -170,15 +170,6 @@ else:
 	else:
 		root.title("{0}".format(language_data["name_window"]))
 
-# Выгрузка изображений
-if sys.platform == "win32":
-	githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.png".format(local_dir)))
-	icon_about_win = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\icon64.png".format(local_dir)))
-else:
-	if sys.platform == "linux":
-		githun_img = ImageTk.PhotoImage(Image.open("{0}/data/img/github.png".format(local_dir)))
-		icon_about_win = ImageTk.PhotoImage(Image.open("{0}/data/img/icon64.png".format(local_dir)))
-
 # Обрабочик прогресса
 def handler_progress():
 	global usr_data
@@ -195,6 +186,19 @@ def handler_progress():
 
 max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 
+# Выгрузка изображений
+if sys.platform == "win32":
+	githun_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\github.pctr".format(local_dir)))
+	icon_about_win = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\icon64.pctr".format(local_dir)))
+	money_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\coin.pctr".format(local_dir)))
+	progress_img = ImageTk.PhotoImage(Image.open("{0}\\data\\img\\progress.pctr".format(local_dir)))
+else:
+	if sys.platform == "linux":
+		githun_img = ImageTk.PhotoImage(Image.open("{0}/data/img/github.pctr".format(local_dir)))
+		icon_about_win = ImageTk.PhotoImage(Image.open("{0}/data/img/icon64.pctr".format(local_dir)))
+		money_img = ImageTk.PhotoImage(Image.open("{0}/data/img/coin.pctr".format(local_dir)))
+		progress_img = ImageTk.PhotoImage(Image.open("{0}/data/img/progress.pctr".format(local_dir)))
+
 # Создание объектов
 if sys.platform == "win32":
 	language_change_B = Button(root, text = "{0}".format(language_data['name_lang']), width = 11)
@@ -209,6 +213,8 @@ bit_progressbar_value_text = Label(root, text = "{0}: {1} {4} \\{2} {4} ({3} %)"
 money_vaule_text = Label(root, text = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"]))
 button_feed_the_cat = Button(root, text = "{0}".format(language_data["button_text_window"]["feed_the_cat"]))
 about_program = Button(root, text = str(language_data["button_text_window"]["about_program"]))
+money_img_label = Label(root, image = money_img)
+progress_img_label = Label(root, image = progress_img)
 # Объекты для разрабочика
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers = Label(root, text = "\"multiplier-start-value\": {0}\n\"multiplier-money\": {1}".format(usr_data["save"]["multiplier-start-value"], usr_data["save"]["multiplier-money"]))
@@ -281,14 +287,14 @@ def loading_text_language(event, id_lang, list_langs, config_data):
 def feed_the_cat_button(event):
 	global usr_data
 	if config_data["eat-dir"] in os.listdir(path = local_dir_dush):
-		if str(sys.platform) == "win32":
-			dush_dir = str(str(local_dir_dush) + "\\" + str(config_data["eat-dir"])) + "\\"
+		if sys.platform == "win32":
+			dush_dir = local_dir_dush + "\\" + config_data["eat-dir"] + "\\"
 		else:
-			if str(sys.platform) == "linux":
-				dush_dir = str(str(local_dir_dush) + "/" + str(config_data["eat-dir"])) + "/"
+			if sys.platform == "linux":
+				dush_dir = local_dir_dush + "/" + config_data["eat-dir"] + "/"
 		dush_file = os.listdir(path = dush_dir)
 		wag_handler_files = 0
-		while wag_handler_files != int(len(dush_file)):
+		while wag_handler_files != len(dush_file):
 			if str(dush_file[wag_handler_files]).endswith(".txt") != True:
 				dush_file.remove(str(dush_file[wag_handler_files]))
 			else:
@@ -297,16 +303,16 @@ def feed_the_cat_button(event):
 				print("DUSH_DIR:", dush_dir)
 				print("DUSH_FILE:", dush_file)
 				print("WAG:", wag_handler_files)
-		if int(len(dush_file)) != 0:
+		if len(dush_file) != 0:
 			size_files = 0
 			wag = 0
 			max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 			errors_handlers = False
 			while wag != int(len(dush_file)):
-				if os.path.isfile(str(dush_dir) + str(dush_file[wag])):
-					size_files += int(os.path.getsize((str(dush_dir) + str(dush_file[wag]))))
+				if os.path.isfile(dush_dir + str(dush_file[wag])):
+					size_files += int(os.path.getsize((dush_dir + str(dush_file[wag]))))
 					if int(max_start_value_progress) >= size_files:
-						os.remove((str(dush_dir) + str(dush_file[wag])), dir_fd = None)
+						os.remove(dush_dir + str(dush_file[wag]), dir_fd = None)
 					else:
 						errors_handlers = True
 						break
@@ -317,22 +323,22 @@ def feed_the_cat_button(event):
 				bit_progressbar["value"] = percentage_progress_user
 				bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
 				money_vaule_text["text"] = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"])
-				notification_bar["text"] = str(language_data["successfully"]["cat_ate"])
+				notification_bar["text"] = language_data["successfully"]["cat_ate"]
 			else:
 				usr_data["save"]["you-user"] = 0
 				max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 				bit_progressbar["value"] = percentage_progress_user
 				bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
-				notification_bar["text"] = str(language_data["errors_feed"]["many_files"])
+				notification_bar["text"] = language_data["errors_feed"]["many_files"]
 		else:
-			notification_bar["text"] = str(language_data["errors_feed"]["not_files_in_dir"])
+			notification_bar["text"] = language_data["errors_feed"]["not_files_in_dir"]
 	else:
 		os.mkdir("{0}\\{1}".format(local_dir_dush, config_data["eat-dir"]), mode = 0o777, dir_fd = None)
 		max_start_value_progress, value_progress_user, percentage_progress_user = handler_progress()
 		bit_progressbar["value"] = percentage_progress_user
 		bit_progressbar_value_text["text"] = "{0}: {1} {4} \\{2} {4} ({3} %)".format(language_data["text_window"]["text_progress"], value_progress_user, max_start_value_progress, percentage_progress_user, language_data["text_window"]["text_bites"])
 		money_vaule_text["text"] = "{0}: {1}".format(language_data["text_window"]["text_money"], usr_data["save"]["money"])
-		notification_bar["text"] = str(language_data["errors_feed"]["not_dir"])
+		notification_bar["text"] = language_data["errors_feed"]["not_dir"]
 
 def github_open_link(event):
 	webbrowser.open_new("https://github.com/romanin-rf/FileCat")
@@ -404,14 +410,17 @@ about_program.bind('<Button-1>', handler_about_window)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
 	command_line_devepoler_enter.bind('<Button-1>', handler_command_line)
 
-# Выгрузка объектов на экран
+# Выгрузка объектов
 language_change_B.place(x = 5, y = 5)
 bit_progressbar.place(x = 100, y = 5)
-bit_progressbar_value_text.place(x = 100, y = 30)
-money_vaule_text.place(x = 100, y = 50)
+bit_progressbar_value_text.place(x = 120, y = 30)
+money_vaule_text.place(x = 120, y = 50)
 button_feed_the_cat.place(x = 5, y = 75)
 notification_bar.place(x = 0, y = 110)
 about_program.place(x = 610, y = 30)
+money_img_label.place(x = 100, y = 50)
+progress_img_label.place(x = 100, y = 30)
+# Выгрузка объектов для разрабочика
 if (dev_sintax[0] in sys.argv) and (dev_sintax[1] in sys.argv):
 	text_info_multipliers.place(x = 500, y = 30)
 if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
