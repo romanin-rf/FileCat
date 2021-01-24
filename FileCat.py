@@ -74,7 +74,7 @@ else:
 	else:
 		raise OSError("Your OS is not supported")
 
-# Обновления
+# Функция последнего обновления
 def last_check_update():
 	global config_data
 	user_time_start, user_func_time_start = [], datetime.datetime.now()
