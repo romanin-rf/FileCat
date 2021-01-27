@@ -403,6 +403,32 @@ def handler_about_window(event):
 		if not(int(root_about.winfo_exists()) == 1):
 			about_window(event)
 
+def PluginImport():
+	global root
+	list_files_plugin = os.listdir()
+	list_load_plugin = []
+	list_plugin_all = []
+	wag = 0
+	while wag != len(list_files_plugin):
+		if list_files_plugin[wag].endswith(".py") and (list_files_plugin[wag] != os.path.basename("{0}".format(sys.argv[0]))):
+			list_plugin_all.append(str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
+			try:
+				exec("global root;import " + str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
+				list_load_plugin.append(str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
+			except:
+				pass
+		wag += 1
+	text_msgb = ""
+	wag_msgb = 0
+	while wag_msgb != len(list_plugin_all):
+		if list_plugin_all[wag_msgb] in list_load_plugin:
+			text_msgb += "{0} is loaded... ок\n".format(list_plugin_all[wag_msgb])
+		else:
+			text_msgb += "{0} is not loaded... error\n".format(list_plugin_all[wag_msgb])
+		wag_msgb += 1
+	if len(list_plugin_all) != 0:
+		ctypes.windll.user32.MessageBoxW(0, text_msgb, str(sys.argv[0]), 64)
+
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
 button_feed_the_cat.bind('<Button-1>', feed_the_cat_button)
@@ -427,6 +453,10 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
 	command_line_devepoler.place(x = 5, y = 140)
 	command_line_devepoler_enter.place(x = 660, y = 135)
 
+# Загрузка плагинов
+PluginImport()
+
+# Конец
 root.mainloop()
 usr_data_base = base64.urlsafe_b64encode(json.dumps(usr_data).encode()).decode()
 with open('user_data.json', "w") as user_data_file:
