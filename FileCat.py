@@ -146,9 +146,12 @@ except:
 	ctypes.windll.user32.MessageBoxW(0, "Failed to get update information. Possible problems:\n1. There is no internet connection\n2. The developer provided an incorrect update link", "File Cat", 16)
 
 if dev_sintax[0] in sys.argv:
-	print("\n- NeedUpdateData:", NeedUpdateData)
-	if NeedUpdateData == True:
-		print("- URLUpdate: \"" + URLUpdate + "\"")
+	try:
+		print("\n- NeedUpdateData:", NeedUpdateData)
+		if NeedUpdateData == True:
+			print("- URLUpdate: \"" + URLUpdate + "\"")
+	except:
+		print("\n- NeedUpdateData: ERROR")
 
 # Создание окна
 root = Tk()
@@ -408,25 +411,45 @@ def PluginImport():
 	list_files_plugin = os.listdir()
 	list_load_plugin = []
 	list_plugin_all = []
+	list_plugin_system = []
+	list_plugin_init = []
 	wag = 0
 	while wag != len(list_files_plugin):
 		if list_files_plugin[wag].endswith(".py") and (list_files_plugin[wag] != os.path.basename("{0}".format(sys.argv[0]))):
 			list_plugin_all.append(str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
 			try:
-				exec("global root;import " + str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
+				exec("import " + str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
 				list_load_plugin.append(str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
 			except:
 				pass
 		wag += 1
+	wag_init = 0
+	while wag_init != len(list_load_plugin):
+		try:
+			exec("{0}.{1}({2})".format(list_load_plugin[wag_init], eval("{0}.info[1]".format(list_load_plugin[wag_init])), eval("\", \".join({0}.info[2])".format(list_load_plugin[wag_init]))))
+			list_plugin_init.append(list_load_plugin[wag_init])
+		except:
+			pass
+		wag_init += 1
 	text_msgb = ""
 	wag_msgb = 0
 	while wag_msgb != len(list_plugin_all):
 		if list_plugin_all[wag_msgb] in list_load_plugin:
-			text_msgb += "{0} is loaded... ок\n".format(list_plugin_all[wag_msgb])
+			if str(eval("{0}.info[0]".format(list_plugin_all[wag_msgb]))) == "app":
+				text_msgb += "{0} is loaded... ок\n".format(list_plugin_all[wag_msgb])
+				if list_plugin_all[wag_msgb] in list_plugin_init:
+					text_msgb += "{0} is initialized... ок\n".format(list_plugin_all[wag_msgb])
+				else:
+					text_msgb += "{0} is not initialized... error code\n".format(list_plugin_all[wag_msgb])
+			else:
+				if str(eval("{0}.info[0]".format(list_plugin_all[wag_msgb]))) == "system":
+					pass
+				else:
+					text_msgb += "{0} is not loaded... error info\n".format(list_plugin_all[wag_msgb])
 		else:
-			text_msgb += "{0} is not loaded... error\n".format(list_plugin_all[wag_msgb])
+			text_msgb += "{0} is not loaded... error code\n".format(list_plugin_all[wag_msgb])
 		wag_msgb += 1
-	if len(list_plugin_all) != 0:
+	if len(text_msgb) != 0:
 		ctypes.windll.user32.MessageBoxW(0, text_msgb, str(sys.argv[0]), 64)
 
 # Параметры объекта и их привязка к логике
@@ -458,6 +481,3 @@ PluginImport()
 
 # Конец
 root.mainloop()
-usr_data_base = base64.urlsafe_b64encode(json.dumps(usr_data).encode()).decode()
-with open('user_data.json', "w") as user_data_file:
-	json.dump(usr_data_base, user_data_file)
