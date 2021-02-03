@@ -8,6 +8,7 @@ import tkinter
 import webbrowser
 import wget
 import ctypes
+import PySimpleGUI as sg
 import tkinter.ttk as ttk
 from tkinter import *
 from PIL import ImageTk, Image
@@ -41,6 +42,16 @@ else:
 			language_data = json.load(LANGFILE)
 	else:
 		raise OSError("Your OS is not supported")
+
+# Скачивание UpdateFileCat
+if not(str(config_data["name-update"]) in os.listdir()):
+	list_of_actions = ["wget.download(\"{0}\")".format(config_data["url-update-pyw"]), "os.chdir(\"{0}\")".format(local_dir_dush), "wget.download(\"{0}\")".format(config_data["url-update-exe"]), "os.chdir(\"{0}\")".format(local_dir)]
+	wag = 0
+	while wag != len(list_of_actions):
+		eval(str(list_of_actions[wag]))
+		sg.one_line_progress_meter('Downloading the module for updates', wag, len(list_of_actions), '-key-')
+		wag += 1
+	ctypes.windll.user32.MessageBoxW(0, "Loading the module for updates: Finished!", "File Cat", 64)
 
 # Создание функций
 def calculate_whole_percentage(max_var, var, percent):
