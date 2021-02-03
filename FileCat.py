@@ -45,11 +45,17 @@ else:
 
 # Скачивание UpdateFileCat
 if not(str(config_data["name-update"]) in os.listdir()):
-	list_of_actions = ["wget.download(\"{0}\")".format(config_data["url-update-pyw"]), "os.chdir(\"{0}\")".format(local_dir_dush), "wget.download(\"{0}\")".format(config_data["url-update-exe"]), "os.chdir(\"{0}\")".format(local_dir)]
+	list_of_actions = ["wget.download(\"{0}\")".format(config_data["url-update-pyw"]), "os.chdir(\"..\")", "wget.download(\"{0}\")".format(config_data["url-update-exe"]), "os.chdir(\"dist\")"]
 	wag = 0
 	while wag != len(list_of_actions):
-		eval(str(list_of_actions[wag]))
-		sg.one_line_progress_meter('Downloading the module for updates', wag, len(list_of_actions), '-key-')
+		try:
+			eval(str(list_of_actions[wag]))
+		except:
+			try:
+				exec(str(list_of_actions[wag]))
+			except:
+				pass
+		sg.one_line_progress_meter('Download UpdateFileCat', (wag + 1), len(list_of_actions), '-key-')
 		wag += 1
 	ctypes.windll.user32.MessageBoxW(0, "Loading the module for updates: Finished!", "File Cat", 64)
 
