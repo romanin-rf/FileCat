@@ -44,20 +44,21 @@ else:
 		raise OSError("Your OS is not supported")
 
 # Скачивание UpdateFileCat
-if not(str(config_data["name-update"]) in os.listdir()):
-	list_of_actions = ["wget.download(\"{0}\")".format(config_data["url-update-pyw"]), "os.chdir(\"..\")", "wget.download(\"{0}\")".format(config_data["url-update-exe"]), "os.chdir(\"dist\")"]
-	wag = 0
-	while wag != len(list_of_actions):
-		try:
-			eval(str(list_of_actions[wag]))
-		except:
+if not(dev_sintax[0] in sys.argv):
+	if not(str(config_data["name-update"]) in os.listdir()):
+		list_of_actions = ["wget.download(\"{0}\")".format(config_data["url-update-pyw"]), "os.chdir(\"..\")", "wget.download(\"{0}\")".format(config_data["url-update-exe"]), "os.chdir(\"dist\")"]
+		wag = 0
+		while wag != len(list_of_actions):
 			try:
-				exec(str(list_of_actions[wag]))
+				eval(str(list_of_actions[wag]))
 			except:
-				pass
-		sg.one_line_progress_meter('Download UpdateFileCat', (wag + 1), len(list_of_actions), '-key-')
-		wag += 1
-	ctypes.windll.user32.MessageBoxW(0, "Loading the module for updates: Finished!", "File Cat", 64)
+				try:
+					exec(str(list_of_actions[wag]))
+				except:
+					pass
+			sg.one_line_progress_meter('Download UpdateFileCat', (wag + 1), len(list_of_actions), '-key-')
+			wag += 1
+		ctypes.windll.user32.MessageBoxW(0, "Loading the module for updates: Finished!", "File Cat", 64)
 
 # Создание функций
 def calculate_whole_percentage(max_var, var, percent):
@@ -325,49 +326,68 @@ def handler_about_window(event):
 
 def PluginImport():
 	global root, config_data, usr_data, about_window_first_open
-	list_files_plugin = os.listdir()
-	list_load_plugin = []
-	list_plugin_all = []
-	list_plugin_system = []
-	list_plugin_init = []
-	wag = 0
-	while wag != len(list_files_plugin):
-		if list_files_plugin[wag].endswith(".py") and (list_files_plugin[wag] != os.path.basename("{0}".format(sys.argv[0]))):
-			list_plugin_all.append(str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
+	plugins_dir_list = os.listdir("{0}\\{1}".format(local_dir, config_data["plugins_dir"]))
+
+	if len(plugins_dir_list) > 0:
+		# Обработка списка плагинов
+		plugins_list = []
+		wag_handler_plugins = 0
+		while wag_handler_plugins != len(plugins_dir_list):
+			if plugins_dir_list[wag_handler_plugins].endswith(".py"):
+				plugins_list.append(plugins_dir_list[wag_handler_plugins].replace(".py", ""))
+			wag_handler_plugins += 1
+
+		# Создание списка для обработки плагинов
+		plugins_list_error = []
+
+		# Загрузка плагинов
+		wag_load_plugins = 0
+		while wag_load_plugins != len(plugins_list):
 			try:
-				exec("import " + str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
-				list_load_plugin.append(str(list_files_plugin[wag][:(len(list_files_plugin[wag]) - 3)]))
+				exec("import {0}.{1} as {1}".format(config_data["plugins_dir"], plugins_list[wag_load_plugins]))
 			except:
-				pass
-		wag += 1
-	wag_init = 0
-	while wag_init != len(list_load_plugin):
-		try:
-			exec("{0}.{1}({2})".format(list_load_plugin[wag_init], eval("{0}.info[1]".format(list_load_plugin[wag_init])), eval("\", \".join({0}.info[2])".format(list_load_plugin[wag_init]))))
-			list_plugin_init.append(list_load_plugin[wag_init])
-		except:
-			pass
-		wag_init += 1
-	text_msgb = ""
-	wag_msgb = 0
-	while wag_msgb != len(list_plugin_all):
-		if list_plugin_all[wag_msgb] in list_load_plugin:
-			if str(eval("{0}.info[0]".format(list_plugin_all[wag_msgb]))) == "app":
-				text_msgb += "{0} is loaded... ок\n".format(list_plugin_all[wag_msgb])
-				if list_plugin_all[wag_msgb] in list_plugin_init:
-					text_msgb += "{0} is initialized... ок\n".format(list_plugin_all[wag_msgb])
-				else:
-					text_msgb += "{0} is not initialized... error code\n".format(list_plugin_all[wag_msgb])
+				plugins_list_error.append(plugins_list[wag_load_plugins])
+			wag_load_plugins += 1
+
+		# Проверка наличия info
+		wag_handler_plugins_info = 0
+		while wag_handler_plugins_info != len(plugins_list):
+			if not(str(plugins_list[wag_handler_plugins_info]) in plugins_list_error):
+				plugin_wag_dir = eval("dir({0})".format(plugins_list[wag_handler_plugins_info]))
+				if not("info" in plugin_wag_dir):
+					plugins_list_error.append(plugins_list[wag_handler_plugins_info])
+			wag_handler_plugins_info += 1
+		
+		# Инициализация плагинов
+		wag_inited_plugins = 0
+		while wag_inited_plugins != len(plugins_list):
+			if not(plugins_list[wag_inited_plugins] in plugins_list_error):
+				try:
+					eval("{0}.{1}({2})".format(plugins_list[wag_inited_plugins], eval("{0}.info[1]".format(plugins_list[wag_inited_plugins])), ",".join(eval("{0}.info[2]".format(plugins_list[wag_inited_plugins])))))
+				except:
+					try:
+						exec("{0}.{1}({2})".format(plugins_list[wag_inited_plugins], eval("{0}.info[1]".format(plugins_list[wag_inited_plugins])), ",".join(eval("{0}.info[2]".format(plugins_list[wag_inited_plugins])))))
+					except:
+						plugins_list_error.append(str(plugins_list[wag_inited_plugins]))
+			wag_inited_plugins += 1
+
+		# Создание строки для вывода отчёта загрузки плагинов
+		text_plugins_status = ""
+		wag_create_text_status_plugins = 0
+		while wag_create_text_status_plugins != len(plugins_list):
+			if plugins_list[wag_create_text_status_plugins] in plugins_list_error:
+				text_plugins_status += "{0} is not loaded... error\n".format(plugins_list[wag_create_text_status_plugins])
 			else:
-				if str(eval("{0}.info[0]".format(list_plugin_all[wag_msgb]))) == "system":
+				if str(eval("{0}.info[0]".format(plugins_list[wag_create_text_status_plugins]))) == "sys":
 					pass
+				elif str(eval("{0}.info[0]".format(plugins_list[wag_create_text_status_plugins]))) == "app":
+					text_plugins_status += "{0} is loaded... ok\n".format(plugins_list[wag_create_text_status_plugins])
 				else:
-					text_msgb += "{0} is not loaded... error info\n".format(list_plugin_all[wag_msgb])
-		else:
-			text_msgb += "{0} is not loaded... error code\n".format(list_plugin_all[wag_msgb])
-		wag_msgb += 1
-	if len(text_msgb) != 0:
-		ctypes.windll.user32.MessageBoxW(0, text_msgb, str(sys.argv[0]), 64)
+					text_plugins_status += "{0} is loaded... ok, but plugin type is incorrect\n".format(plugins_list[wag_create_text_status_plugins])
+			wag_create_text_status_plugins += 1
+		
+		if len(text_plugins_status) > 1:
+			ctypes.windll.user32.MessageBoxW(0, text_plugins_status, str(sys.argv[0]), 64)
 
 # Параметры объекта и их привязка к логике
 language_change_B.bind('<Button-1>', language_change_click)
@@ -393,7 +413,7 @@ if (dev_sintax[0] in sys.argv) and (dev_sintax[5] in sys.argv):
 	command_line_devepoler.place(x = 5, y = 140)
 	command_line_devepoler_enter.place(x = 660, y = 135)
 
-# Загрузка плагинов
+# Загрузка плагинов (гениально знаю)
 PluginImport()
 
 # Конец
